@@ -49,4 +49,4 @@ Klaar om uw comfort te verhogen? De installatie is eenvoudig en stap-voor-stap u
 [**📖 KLIK HIER VOOR DE INSTALLATIEHANDLEIDING**](HANDLEIDING.md)
 
 ---
-*Developed by Home Optimizer*
+<p align="center"><em>Developed by Home Optimizer</em></p>
