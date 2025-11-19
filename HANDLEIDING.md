@@ -41,8 +41,7 @@ Voordat we software installeren, moet Home Assistant de basis kennen.
 
 > [!IMPORTANT]
 > **Toegang van buitenaf**
-> ClimaCore moet weten wanneer je onderweg naar huis bent (via 4G).
-> Wij raden **Home Assistant Cloud (Nabu Casa)** aan.
+> ClimaCore moet weten wanneer je onderweg naar huis bent (via 4G). Wij raden **Home Assistant Cloud (Nabu Casa)** aan.
 > * Veilig & werkt direct.
 > * Inclusief **Google Assistant** ("Hey Google, zet de verwarming op 21 graden!").
 
@@ -66,7 +65,7 @@ We installeren nu de winkel voor de ClimaCore software.
 **Voer nu het installatiecommando in:**
 
 ```bash
-wget -O - [https://get.hacs.xyz](https://get.hacs.xyz) | bash -
+wget -O - https://get.hacs.xyz | bash -
 [!WARNING] Let op bij het plakken! Ctrl+V werkt vaak niet in het terminal venster. Klik met je Rechtermuisknop in het zwarte scherm en kies Plakken (Paste). Druk daarna op ENTER.
 
 Herstart hierna Home Assistant volledig en voeg de HACS integratie toe via Apparaten & Diensten.
