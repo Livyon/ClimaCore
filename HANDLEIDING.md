@@ -64,8 +64,8 @@ We installeren nu de winkel voor de ClimaCore software.
 
 **Voer nu het installatiecommando in:**
 
-```bash
-wget -O - [https://get.hacs.xyz](https://get.hacs.xyz) | bash -
+```
+wget -O - https://get.hacs.xyz | bash -
 ```
 
 > [!WARNING]
