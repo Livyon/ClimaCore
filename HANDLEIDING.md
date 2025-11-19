@@ -65,81 +65,85 @@ We installeren nu de winkel voor de ClimaCore software.
 **Voer nu het installatiecommando in:**
 
 ```bash
-wget -O - https://get.hacs.xyz | bash -
-[!WARNING] Let op bij het plakken! Ctrl+V werkt vaak niet in het terminal venster. Klik met je Rechtermuisknop in het zwarte scherm en kies Plakken (Paste). Druk daarna op ENTER.
+wget -O - [https://get.hacs.xyz](https://get.hacs.xyz) | bash -
+```
 
-Herstart hierna Home Assistant volledig en voeg de HACS integratie toe via Apparaten & Diensten.
+> [!WARNING]
+> **Let op bij het plakken!**
+> `Ctrl+V` werkt vaak niet in het terminal venster.
+> Klik met je **Rechtermuisknop** in het zwarte scherm en kies **Plakken** (Paste). Druk daarna op ENTER.
 
-📦 Fase 3: Installatie
-3.1 Dashboard Tools (via HACS Frontend)
+Herstart hierna Home Assistant volledig en voeg de **HACS** integratie toe via *Apparaten & Diensten*.
+
+---
+
+## 📦 Fase 3: Installatie
+
+### 3.1 Dashboard Tools (via HACS Frontend)
 Zoek en installeer deze drie onderdelen in HACS > Frontend:
+* ☑️ `Bubble Card` (Voor de interface)
+* ☑️ `Restriction Card` (Voor beveiliging gastenmodus)
+* ☑️ `card-mod` (Voor de achtergronden)
 
-☑️ Bubble Card (Voor de interface)
+### 3.2 ClimaCore (via HACS Integraties)
+1.  Ga naar HACS > Integraties > 3 puntjes (rechtsboven) > **Aangepaste repositories**.
+2.  Plak de ClimaCore GitHub link.
+3.  Download ClimaCore en **herstart Home Assistant**.
 
-☑️ Restriction Card (Voor beveiliging gastenmodus)
+---
 
-☑️ card-mod (Voor de achtergronden)
+## 🔑 Fase 4: Activeren & Configureren
 
-3.2 ClimaCore (via HACS Integraties)
-Ga naar HACS > Integraties > 3 puntjes (rechtsboven) > Aangepaste repositories.
+Ga naar **Instellingen** > **Apparaten & Diensten** > **+ Integratie toevoegen** > **ClimaCore**.
+Vul je activatiecode in. Klik daarna op **Configureren**.
 
-Plak de ClimaCore GitHub link.
+### De Instellingen uitgelegd:
 
-Download ClimaCore en herstart Home Assistant.
+* **Doeltijd Ochtend:** Hoe laat wil je het warm hebben?
+* **Opwarmtijd (minuten per graad):** *De belangrijkste instelling!*
+    * *Vloerverwarming:* Vul `45` tot `60` in.
+    * *Radiatoren:* Vul `20` tot `30` in.
+* **Zones & Setpoints:**
+    * Koppel je thermostaten aan een zone.
+    * **Setpoint Groep:** Vertel ClimaCore wat voor kamer het is (bijv. "Woonkamer").
+    * Stel de temperaturen in voor **Dag - Fris** (normaal) en **Dag - Koud** (vrieskou).
 
-🔑 Fase 4: Activeren & Configureren
-Ga naar Instellingen > Apparaten & Diensten > + Integratie toevoegen > ClimaCore. Vul je activatiecode in. Klik daarna op Configureren.
+---
 
-De Instellingen uitgelegd:
-Doeltijd Ochtend: Hoe laat wil je het warm hebben?
+## 🎨 Fase 5: Dashboard & Thema
 
-Opwarmtijd (minuten per graad): De belangrijkste instelling!
+Ga naar het **ClimaCore Apparaat** in Home Assistant en gebruik de installatieknoppen:
 
-Vloerverwarming: Vul 45 tot 60 in.
+1.  Druk op **Thema Installeren**.
+2.  Druk op **Dashboard Sjabloon Kopiëren**.
 
-Radiatoren: Vul 20 tot 30 in.
+### Het Dashboard plaatsen
+1.  Kijk in de meldingen (zijbalk). Klik **Rechtermuisknop** op de link > **Linkadres kopiëren**.
+2.  Open een nieuw tabblad, plak de link, en **kopieer alle code**.
+3.  Maak een nieuw Dashboard aan in Home Assistant.
+4.  Klik potloodje ✏️ > 3 puntjes > **Raw configuration editor**.
+5.  Plak de code.
 
-Zones & Setpoints:
+> [!NOTE]
+> **Thema Activeren**
+> Vergeet niet in de dashboard-instellingen (of je profiel) het thema op **ClimaCore Theme** te zetten, anders zie je de dynamische achtergronden niet!
 
-Koppel je thermostaten aan een zone.
+---
 
-Setpoint Groep: Vertel ClimaCore wat voor kamer het is (bijv. "Woonkamer").
+## 🤖 Fase 6: Slimme Automatiseringen
 
-Stel de temperaturen in voor Dag - Fris (normaal) en Dag - Koud (vrieskou).
-
-🎨 Fase 5: Dashboard & Thema
-Ga naar het ClimaCore Apparaat in Home Assistant en gebruik de installatieknoppen:
-
-Druk op Thema Installeren.
-
-Druk op Dashboard Sjabloon Kopiëren.
-
-Het Dashboard plaatsen
-Kijk in de meldingen (zijbalk). Klik Rechtermuisknop op de link > Linkadres kopiëren.
-
-Open een nieuw tabblad, plak de link, en kopieer alle code.
-
-Maak een nieuw Dashboard aan in Home Assistant.
-
-Klik potloodje ✏️ > 3 puntjes > Raw configuration editor.
-
-Plak de code.
-
-[!NOTE] Thema Activeren Vergeet niet in de dashboard-instellingen (of je profiel) het thema op ClimaCore Theme te zetten, anders zie je de dynamische achtergronden niet!
-
-🤖 Fase 6: Slimme Automatiseringen
 Je kunt via het ClimaCore apparaat twee extra Blueprints installeren:
 
-🚗 1. Slimme Voorverwarming (Gratis)
-Werkt via de 'Proximity' integratie. ClimaCore ziet dat je onderweg bent en vraagt: "Zal ik de verwarming alvast aanzetten?"
+### 🚗 1. Slimme Voorverwarming (Gratis)
+*Werkt via de 'Proximity' integratie.*
+ClimaCore ziet dat je onderweg bent en vraagt: *"Zal ik de verwarming alvast aanzetten?"*
 
-🚦 2. ClimaCore Pro: Google Maps (Premium)
-Werkt via Google Cloud Platform. Wil je sturen op basis van actuele file-informatie?
+### 🚦 2. ClimaCore Pro: Google Maps (Premium)
+*Werkt via Google Cloud Platform.*
+Wil je sturen op basis van **actuele file-informatie**?
+* Dit is een **Pro Service** van Home Optimizer.
+* Wij regelen de Google Cloud setup en API-keys.
+* Neem contact op voor een upgrade.
 
-Dit is een Pro Service van Home Optimizer.
-
-Wij regelen de Google Cloud setup en API-keys.
-
-Neem contact op voor een upgrade.
-
+---
 <p align="center"><em>Developed by Home Optimizer</em></p>
