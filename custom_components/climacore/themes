@@ -1,0 +1,91 @@
+climacore_theme:
+  # ===================================================================
+  # 1. CORE KLEUREN (POWER & CONTRAST)
+  # ===================================================================
+
+  # PRIMARY: Geen lichtblauw meer, maar 'Deep Tech Teal'.
+  # Dit is een donkere, professionele kleur voor sliders/randen.
+  primary-color: "#009688"
+
+  # ACTIVE: 'Safety Orange'. Alles wat aan staat, knalt eruit.
+  active-state-color: "#FF6D00"
+
+  # --- Achtergronden (DE BELANGRIJKSTE WIJZIGING) ---
+
+  # 1. Fallback: Massief donkergrijs (bijna zwart)
+  primary-background-color: "#121212"
+
+  # 2. Kaart Achtergrond: 'Heavy Armor'
+  #    We gaan naar 90% dekking (0.9).
+  #    Hierdoor zie je de kleur van de achtergrond NIET meer
+  #    door de kaart heen lekken (dus geen blauwe waas).
+  secondary-background-color: "rgba(18, 18, 18, 0.90)"
+
+  # ===================================================================
+  # 2. UI ELEMENTEN
+  # ===================================================================
+
+  # --- Merk-kleuren ---
+  ha-color-primary: "var(--primary-color)"
+  ha-color-primary-40: "var(--primary-color)"
+  mdc-theme-primary: "var(--primary-color)"
+
+  # Actieve statussen (Oranje)
+  state-active-color: "var(--active-state-color)"
+  switch-checked-color: "var(--active-state-color)"
+
+  # Thermostaat Logic
+  climate-color-setpoint: "var(--active-state-color)"
+  state-climate-heat-color: "var(--active-state-color)"
+  state-climate-cool-color: "#009688" # De Deep Teal voor koelen
+  state-climate-idle-color: "#455A64" # Donkergrijs staal voor idle
+
+  # --- Text (Altijd Wit voor maximaal contrast) ---
+  primary-text-color: "#FFFFFF"
+  secondary-text-color: "#B0BEC5"
+
+  # --- Grenzen & Kaders ---
+  # Inactieve lijnen zijn donkergrijs, niet blauw.
+  input-idle-border-color: "#424242"
+  input-active-border-color: "var(--active-state-color)"
+
+  # --- Knoppen ---
+  paper-toggle-button-checked-button-color: "var(--active-state-color)"
+  paper-toggle-button-checked-bar-color: "rgba(255, 109, 0, 0.3)"
+  paper-slider-knob-color: "var(--active-state-color)"
+  paper-slider-pin-color: "var(--active-state-color)"
+
+  # --- Iconen ---
+  paper-item-icon-active-color: "var(--active-state-color)"
+  icon-active-color: "var(--active-state-color)"
+  state-icon-color: "#78909C" # Neutraal grijsblauw (meer grijs dan blauw)
+
+  # --- Card Styling ---
+  ha-card-background: "var(--secondary-background-color)"
+  card-background-color: "var(--secondary-background-color)"
+
+  # Scherpe, technische randen
+  ha-card-border-width: "1px"
+  ha-card-border-color: "rgba(255,255,255,0.08)"
+  ha-card-box-shadow: "0px 4px 8px rgba(0,0,0,0.4)" # Diepere schaduw voor 'zwevend' effect
+
+  bubble-main-background-color: "var(--secondary-background-color)"
+  sidebar-background-color: "#101010"
+
+  # ===================================================================
+  # 3. CARD-MOD
+  # ===================================================================
+  card-mod-theme: climacore_theme
+  card-mod-view-yaml: |
+    .: |
+      hui-masonry-view, hui-sidebar-view, hui-sections-view, hui-panel-view {
+        background: center / cover no-repeat fixed url("{{ states('sensor.climacore_background_url') }}") #121212 !important;
+        height: 100%; 
+      }
+      ha-card {
+        background: var(--secondary-background-color) !important;
+        /* Geen blur meer nodig omdat de kaart donkerder is, 
+           dit maakt de interface 'scherper' */
+        backdrop-filter: none; 
+        border: 1px solid rgba(255,255,255,0.08) !important;
+      }
