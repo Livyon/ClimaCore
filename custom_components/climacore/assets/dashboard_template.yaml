@@ -1,0 +1,929 @@
+# Dit is de 'wrapper' die het een dashboard maakt
+title: ClimaCore
+views:
+  # Dit is jouw 'Home' tabblad-configuratie
+  - type: sections
+    max_columns: 2
+    title: Home
+    path: home
+    icon: mdi:home
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: subtitle
+            heading: Weerbericht
+            icon: mdi:weather-cloudy
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: weather.forecast_thuis
+            show_attribute: true
+            attribute: temperature
+            styles: |
+              ha-card {
+                background: rgba(0, 0, 0, 0.0) !important;
+              }
+              .name {
+                color: white !important;
+              }
+            grid_options:
+              columns: full
+              rows: 1
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: subtitle
+            heading: Kalender
+            icon: mdi:calendar
+          - type: custom:bubble-card
+            card_type: calendar
+            button_type: switch
+            event_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Kalender"
+            entities:
+              - entity: calendar.gezin
+                color: orange
+              - entity: calendar.feestdagen_in_belgie
+                color: "#36DCD1"
+            show_place: false
+            sub_button: []
+            grid_options:
+              columns: full
+            styles: |
+              ha-card {
+                background: rgba(0, 0, 0, 0.0) !important;
+              }
+              .name {
+                color: white !important;
+              }
+            template: >
+              {% set today = now().date() %} {% set tomorrow = today +
+              timedelta(days=1) %} {% set events_today_tomorrow =
+              state_attr('calendar.gezin', 'all_day') | selectattr('start_time',
+              'le', tomorrow) | selectattr('end_time', 'ge', today) | list | count >
+              0 %} {% if events_today_tomorrow %}
+                icon_color: orange
+              {% else %}
+                icon_color: var(--primary-color)
+              {% endif %}
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Kalender"
+                button_type: name
+                auto_close: "15000"
+                close_on_click: false
+                show_icon: true
+                scrolling_effect: true
+                show_last_changed: true
+                name: Kalender
+                icon: mdi:calendar
+                show_header: false
+                styles: |
+                  --bubble-card-pop-up-background-max-height: 30vh;
+                  --bubble-card-pop-up-background-height: 30vh;
+                  --bubble-card-pop-up-max-width: 400px;
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+                close_by_clicking_outside: true
+              - type: calendar
+                entities:
+                  - calendar.gezin
+                  - calendar.feestdagen_in_belgie
+                title: Kalender popup
+            grid_options:
+              columns: full
+              rows: 1
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            scrolling_effect: false
+            name: Gang
+            icon: mdi:stairs
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Gang"
+            styles: |
+              .bubble-icon, .name {
+                color: white !important;
+              }
+            card_mod:
+              style: |
+                .bubble-icon {
+                  color: {% if is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_gang', 'on') or is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_gang_zolder', 'on') or is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_trapverlichting', 'on') %} #FFE767 {% else %} white {% endif %} !important;
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Gang"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_gang
+                show_icon: true
+                scrolling_effect: false
+                show_state: false
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                name: Gang
+                icon: mdi:lightbulb
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: >-
+                  switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_gang_zolder
+                scrolling_effect: false
+                show_state: false
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                name: Gang boven
+                icon: mdi:lightbulb
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: >-
+                  switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_licht_voordeur
+                scrolling_effect: false
+                show_state: false
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                name: Licht voordeur
+                icon: mdi:lightbulb
+                force_icon: true
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Woonkamer
+            icon: mdi:sofa
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Woonkamer"
+            grid_options:
+              columns: full
+            styles: |
+              .bubble-icon, .name {
+                color: white !important;
+              }
+            card_mod:
+              style: |
+                .bubble-icon {
+                  color: {% if is_state('light.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_wandlampen', 'on') or is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_salontafel', 'on') %} #FFE767 {% else %} white {% endif %} !important;
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Woonkamer"
+                button_type: name
+                auto_close: "15000"
+                show_header: false
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: switch
+                    entity: >-
+                      switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_salontafel
+                    scrolling_effect: false
+                    show_state: false
+                    show_name: true
+                    name: Salontafel
+                    icon: mdi:ceiling-light
+                    styles: |
+                      .bubble-icon, .name {
+                        color: white !important;
+                      }
+                    force_icon: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: >-
+                      light.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_wandlampen
+                    show_state: false
+                    scrolling_effect: false
+                    show_name: true
+                    name: Wandlampen
+                    icon: mdi:wall-sconce
+                    styles: |
+                      .bubble-icon, .name {
+                        color: white !important;
+                      }
+                    force_icon: true
+                    card_mod:
+                      style: |
+                        .bubble-button-background {
+                          background-color: {% if is_state('light.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_wandlampen', 'on') %} #FFE767 {% else %} var(--bubble-button-background-off-color) {% endif %} !important;
+                        }
+                        ha-slider {
+                          --ha-slider-active-color: {% if is_state('light.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_wandlampen', 'on') %} #FFE767 {% else %} var(--ha-slider-inactive-color) {% endif %} !important;
+                          --ha-slider-knob-color: {% if is_state('light.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_wandlampen', 'on') %} #FFE767 {% else %} var(--ha-slider-knob-inactive-color) {% endif %} !important;
+                        }
+              - type: custom:bubble-card
+                card_type: climate
+                entity: climate.my_home_ambisense_woonkamer
+                sub_button:
+                  - name: HVAC modes menu
+                    select_attribute: hvac_modes
+                    state_background: false
+                    show_arrow: false
+                scrolling_effect: false
+                show_name: true
+                show_state: false
+                show_attribute: true
+                attribute: current_temperature
+                force_icon: true
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Eetkamer
+            icon: mdi:table-furniture
+            scrolling_effect: false
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Eetkamer"
+            styles: |
+              .bubble-icon, .name {
+                color: white !important;
+              }
+            card_mod:
+              style: |
+                .bubble-icon {
+                  color: {% if is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_eettafel', 'on') or is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_barkast', 'on') %} #FFE767 {% else %} white {% endif %} !important;
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Eetkamer"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: >-
+                  switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_barkast
+                show_state: false
+                scrolling_effect: false
+                show_name: true
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                show_icon: true
+                icon: mdi:lightbulb
+                name: Barkast
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: >-
+                  switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_eettafel
+                scrolling_effect: false
+                show_state: false
+                show_name: true
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                show_icon: true
+                name: Eettafel
+                icon: mdi:lightbulb
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: climate
+                entity: climate.my_home_ambisense_eetkamer
+                sub_button:
+                  - name: HVAC modes menu
+                    select_attribute: hvac_modes
+                    state_background: false
+                    show_arrow: false
+                scrolling_effect: false
+                show_name: true
+                show_state: false
+                show_attribute: true
+                attribute: current_temperature
+                force_icon: true
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            scrolling_effect: false
+            name: Keuken
+            icon: mdi:chef-hat
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Keuken"
+            styles: |-
+              .bubble-icon, .name {
+                color: white !important;
+              }
+            card_mod:
+              style: |
+                .bubble-icon {
+                  color: {% if is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_keuken', 'on') or is_state('light.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_schuifdeur', 'on') %} #FFE767 {% else %} white {% endif %} !important;
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Keuken"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: >-
+                  switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_keuken
+                scrolling_effect: false
+                show_state: false
+                show_name: true
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                name: Keuken
+                icon: mdi:lightbulb
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: >-
+                  light.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_schuifdeur
+                scrolling_effect: false
+                show_state: false
+                show_name: true
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                name: Schuifraam
+                force_icon: true
+                card_mod:
+                  style: |
+                    .bubble-button-background {
+                      background-color: {% if is_state('light.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_schuifdeur', 'on') %} #FFE767 {% else %} var(--bubble-button-background-off-color) {% endif %} !important;
+                    }
+                    ha-slider {
+                      --ha-slider-active-color: {% if is_state('light.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_schuifdeur', 'on') %} #FFE767 {% else %} var(--ha-slider-inactive-color) {% endif %} !important;
+                      --ha-slider-knob-color: {% if is_state('light.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_schuifdeur', 'on') %} #FFE767 {% else %} var(--ha-slider-knob-inactive-color) {% endif %} !important;
+                    }
+              - type: custom:bubble-card
+                card_type: climate
+                entity: climate.my_home_ambisense_keuken
+                sub_button:
+                  - name: HVAC modes menu
+                    select_attribute: hvac_modes
+                    state_background: false
+                    show_arrow: false
+                scrolling_effect: false
+                show_name: true
+                show_state: false
+                show_attribute: true
+                attribute: current_temperature
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                entity: binary_sensor.raamsensor_schuifdeur
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                force_icon: true
+                scrolling_effect: false
+                show_icon: true
+                show_state: true
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Elena
+            icon: mdi:bed
+            scrolling_effect: false
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Elena"
+            styles: |
+              .bubble-icon, .name {
+                color: white !important;
+              }
+            card_mod:
+              style: |
+                .bubble-icon {
+                  color: {% if is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_slaapkamer_elena', 'on') %} #FFE767 {% else %} white {% endif %} !important;
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Elena"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: >-
+                  switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_slaapkamer_elena
+                show_state: false
+                show_icon: true
+                scrolling_effect: false
+                show_name: true
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                name: Slaapkamer Elena
+                icon: mdi:lightbulb
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: cover
+                entity: >-
+                  cover.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_rolluik_kamer_elena
+                show_state: false
+                show_attribute: true
+                attribute: current_position
+                scrolling_effect: false
+                force_icon: true
+                name: Rolluik Elena
+              - type: custom:bubble-card
+                card_type: climate
+                entity: climate.my_home_ambisense_slaapkamer_1
+                sub_button:
+                  - name: HVAC modes menu
+                    select_attribute: hvac_modes
+                    state_background: false
+                    show_arrow: false
+                scrolling_effect: false
+                show_name: true
+                show_state: false
+                show_attribute: true
+                attribute: current_temperature
+                force_icon: true
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: state
+                    entity: binary_sensor.raamsensor_1_elena
+                    scrolling_effect: false
+                    show_name: true
+                    show_state: true
+                    styles: |
+                      .bubble-icon, .name {
+                        color: white !important;
+                      }
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: state
+                    entity: binary_sensor.raamsensor_2_elena_2
+                    show_state: true
+                    styles: |
+                      .bubble-icon, .name {
+                        color: white !important;
+                      }
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Badkamer
+            icon: mdi:shower
+            scrolling_effect: false
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Badkamer"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Badkamer"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                bg_blur: "0"
+                bg_opacity: "0"
+                margin_top_mobile: 56px
+              - type: custom:bubble-card
+                card_type: climate
+                button_type: state
+                entity: climate.my_home_ambisense_badkamer
+                sub_button:
+                  - name: HVAC modes menu
+                    select_attribute: hvac_modes
+                    state_background: false
+                    show_arrow: false
+                scrolling_effect: false
+                show_attribute: true
+                attribute: current_temperature
+                show_name: true
+                force_icon: true
+                show_state: false
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                entity: binary_sensor.raamsensor_badkamer
+                scrolling_effect: false
+                force_icon: true
+                show_state: true
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Liam
+            icon: mdi:bed
+            scrolling_effect: false
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Liam"
+            styles: |
+              .bubble-icon, .name {
+                color: white !important;
+              }
+            card_mod:
+              style: |
+                .bubble-icon {
+                  color: {% if is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_slaapkamer_liam', 'on') %} #FFE767 {% else %} white {% endif %} !important;
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Liam"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: >-
+                  switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_slaapkamer_liam
+                scrolling_effect: false
+                show_state: false
+                show_name: true
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                name: Slaapkamer Liam
+                icon: mdi:lightbulb
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: cover
+                entity: >-
+                  cover.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_rolluik_kamer_liam
+                scrolling_effect: false
+                show_state: true
+                show_attribute: true
+                attribute: current_position
+                name: Rolluik Liam
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: climate
+                entity: climate.my_home_ambisense_slaapkamer_2
+                sub_button:
+                  - name: HVAC modes menu
+                    select_attribute: hvac_modes
+                    state_background: false
+                    show_arrow: false
+                show_icon: true
+                scrolling_effect: false
+                show_name: true
+                show_state: false
+                show_attribute: true
+                attribute: current_temperature
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                entity: binary_sensor.raamsensor_liam
+                scrolling_effect: false
+                show_state: true
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Ouders
+            scrolling_effect: false
+            icon: mdi:bed
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Ouders"
+            styles: |
+              .bubble-icon, .name {
+                color: white !important;
+              }
+            card_mod:
+              style: |
+                .bubble-icon {
+                  color: {% if is_state('switch.easyplus_embedded_bus_server_v5_00_2_40_192_168_1_146_slaapkamer_ouders', 'on') or is_state('light.ledstrip', 'on') %} #FFE767 {% else %} white {% endif %} !important;
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Ouders"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                bg_blur: "0"
+                bg_opacity: "0"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: >-
+                  switch.easyplus_embedded_bus_server_v5_00_1_40_192_168_1_146_slaapkamer_ouders
+                scrolling_effect: false
+                show_name: true
+                show_state: false
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+                name: Slaapkamer Ouders
+                icon: mdi:lightbulb
+                force_icon: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: light.ledstrip
+                scrolling_effect: false
+                show_name: true
+                show_state: true
+                icon: mdi:led-strip-variant
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+              - type: custom:bubble-card
+                card_type: climate
+                entity: climate.my_home_ambisense_slaapkamer_3
+                sub_button:
+                  - name: HVAC modes menu
+                    select_attribute: hvac_modes
+                    state_background: false
+                    show_arrow: false
+                scrolling_effect: false
+                show_name: true
+                show_state: false
+                show_attribute: true
+                attribute: current_temperature
+                force_icon: true
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Camera(s)
+            icon: mdi:camera
+            scrolling_effect: false
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Camera"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Camera"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                styles: |
+                  --bubble-card-pop-up-max-width: 800px;
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: horizontal-stack
+                cards:
+                  - type: picture-glance
+                    title: Deurbel
+                    entities:
+                      - camera.deurbel
+                    camera_image: camera.deurbel
+                    camera_view: live
+                    show_state: false
+                    show_name: true
+                    styles: |
+                      .bubble-icon, .name {
+                        color: white !important;
+                      }
+                  - type: picture-glance
+                    title: Elena's kamer
+                    entities:
+                      - camera.kamer_elena
+                    camera_image: camera.kamer_elena
+                    camera_view: live
+                    show_state: false
+                    show_name: true
+                    styles: |
+                      .bubble-icon, .name {
+                        color: white !important;
+                      }
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Media
+            icon: mdi:music
+            scrolling_effect: false
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Media"
+            styles: |
+              .bubble-icon, .name {
+                color: white !important;
+              }
+            card_mod:
+              style: |
+                .bubble-icon {
+                  color: {% if is_state('media_player.surround_gelijkvloer', 'playing') or is_state('media_player.surround_gelijkvloer', 'on') or is_state('media_player.audio', 'playing') or is_state('media_player.audio', 'on') or is_state('media_player.google_hub', 'playing') or is_state('media_player.google_hub', 'on') or is_state('media_player.tv', 'playing') or is_state('media_player.tv', 'on') %} #FF8C00 {% else %} white {% endif %} !important;
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Media"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: custom:bubble-card
+                card_type: media-player
+                entity: media_player.surround_gelijkvloer
+                scrolling_effect: false
+                show_state: true
+                icon: mdi:surround-sound
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+              - type: custom:bubble-card
+                card_type: media-player
+                entity: media_player.audio
+                scrolling_effect: false
+                show_state: true
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+              - type: custom:bubble-card
+                card_type: media-player
+                entity: media_player.google_hub
+                icon: mdi:monitor
+                scrolling_effect: false
+                show_state: true
+                styles: |+
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+              - type: custom:bubble-card
+                card_type: media-player
+                entity: media_player.tv
+                scrolling_effect: false
+                show_icon: true
+                show_name: false
+                show_state: true
+                name: TV
+                icon: mdi:youtube-tv
+                styles: |
+                  .bubble-icon, .name {
+                    color: white !important;
+                  }
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Voice Assist
+            icon: mdi:account-voice
+            button_action:
+              tap_action:
+                action: assist
+                pipeline_id: preferred
+                start_listening: true
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: button
+            button_type: name
+            name: Guests
+            icon: mdi:radiator
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: "#Gasten"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#Gasten"
+                button_type: name
+                show_header: false
+                auto_close: "15000"
+                margin_top_mobile: 56px
+                bg_opacity: "0"
+                bg_blur: "0"
+              - type: horizontal-stack
+                cards:
+                  - type: custom:restriction-card
+                    card:
+                      type: custom:bubble-card
+                      card_type: button
+                      entity: input_boolean.gasten_aanwezig
+                      name: Gasten aan
+                      icon: mdi:radiator
+                      button_action:
+                        tap_action:
+                          action: call-service
+                          service: input_boolean.turn_on
+                          target:
+                            entity_id: input_boolean.gasten_aanwezig
+                      styles: |
+                        .bubble-icon, .name {
+                          color: white !important;
+                        }
+                    restrictions:
+                      pin:
+                        code: "1604"
+                  - type: custom:bubble-card
+                    card_type: button
+                    entity: input_boolean.gasten_aanwezig

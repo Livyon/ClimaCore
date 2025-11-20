@@ -1,0 +1,131 @@
+{
+  "title": "ClimaCore",
+  "config": {
+    "step": {
+      "user": {
+        "title": "ClimaCore: Activatie",
+        "description": "Voer je ClimaCore Activatiecode in om te beginnen.",
+        "data": {
+          "activation_code": "Activatiecode"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Activatiecode is ongeldig. Controleer de code en probeer opnieuw.",
+      "cannot_connect": "Kan niet verbinden met de ClimaCore Gateway. Controleer je internetverbinding.",
+      "timeout": "Verbinding met de ClimaCore Gateway time-out. Probeer het later opnieuw.",
+      "unknown": "Een onverwachte fout is opgetreden."
+    },
+    "abort": {
+      "already_configured": "ClimaCore is al geconfigureerd."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ClimaCore Configuratie",
+        "menu_options": {
+          "general": "Stap 1: Algemene Instellingen",
+          "entities": "Stap 2: Hoofd-Entiteiten",
+          "persons": "Stap 3: Personen",
+          "zone_config": "Stap 4: Zone Configuratie",
+          "fallback": "Stap 7: Noodloop (Fallback)",
+          "setpoints": "Stap 8: Setpoint Groepen"
+        }
+      },
+      "general": {
+        "title": "Stap 1: Algemene Instellingen",
+        "description": "Stel de parameters in voor de dag/nacht cyclus.",
+        "data": {
+          "proactive_target_time": "Doeltijd Ochtend (Start Dag)",
+          "night_start_time": "Starttijd Nacht (Slapen)",
+          "minutes_per_degree": "Opwarmtijd (minuten per graad)"
+        }
+      },
+      "entities": {
+        "title": "Stap 2: Hoofd-Entiteiten",
+        "description": "Link de kern-entiteiten en kies je verwarmingshardware.",
+        "data": {
+          "weather_entity": "Weer-entiteit (voor buiten-temp/RV)",
+          "home_wifi_ssid": "Thuis Wi-Fi (SSID)",
+          "wifi_tracker_sensors": "Wi-Fi Verbinding Sensoren (Telefoons)",
+          "gasten_entity": "Gasten Modus (Input Boolean)",
+          "onderweg_entity": "Onderweg Naar Huis (Input Boolean)",
+          "systeem_keuze_direct": "Systeem Type"
+        }
+      },
+      "persons": {
+        "title": "Stap 3: Personen",
+        "description": "Selecteer alle personen die aanwezigheidsdetectie moeten activeren.",
+        "data": {
+          "person_entities": "Personen"
+        }
+      },
+      "fallback": {
+        "title": "Stap 7: Noodloop (Fallback)",
+        "description": "Stel een veilige fallback-temperatuur in voor noodgevallen.",
+        "data": {
+          "fallback_temp": "Noodloop Temperatuur"
+        }
+      },
+      "zone_config": {
+        "title": "Stap 4: Zone Configuratie",
+        "menu_options": {
+          "zone_1": "Zone 1",
+          "zone_2": "Zone 2",
+          "zone_3": "Zone 3",
+          "zone_4": "Zone 4",
+          "zone_5": "Zone 5",
+          "zone_6": "Zone 6",
+          "zone_7": "Zone 7",
+          "zone_8": "Zone 8",
+          "zone_9": "Zone 9",
+          "zone_10": "Zone 10"
+        }
+      },
+      "zone_1": { "title": "Zone 1 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_2": { "title": "Zone 2 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_3": { "title": "Zone 3 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_4": { "title": "Zone 4 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_5": { "title": "Zone 5 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_6": { "title": "Zone 6 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_7": { "title": "Zone 7 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_8": { "title": "Zone 8 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_9": { "title": "Zone 9 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "zone_10": { "title": "Zone 10 Configuratie", "data": { "zone_name": "Zone Naam", "climate_entities": "Climate Entiteiten", "window_sensors": "Raam/Deur Sensoren", "lookup_prefix": "Setpoint Groep" } },
+      "setpoints": {
+        "title": "Stap 8: Setpoint Groepen",
+        "description": "Definieer de doeltemperaturen voor elke logische groep.",
+        "menu_options": {
+          "sp_woonkamer": "Woonkamer Setpoints",
+          "sp_badkamer": "Badkamer Setpoints",
+          "sp_keuken": "Keuken Setpoints",
+          "sp_sk1": "Slaapkamer 1 Setpoints",
+          "sp_sk2": "Slaapkamer 2 Setpoints",
+          "sp_sk3": "Slaapkamer 3 Setpoints"
+        }
+      },
+      "sp_woonkamer": { "title": "Setpoints: Woonkamer", "data": { "temp_woonkamer_afwezig": "Afwezig", "temp_woonkamer_voorverwarming": "Voorverwarming", "temp_woonkamer_dag_fris": "Dag - Fris", "temp_woonkamer_dag_koud": "Dag - Koud", "temp_woonkamer_dag_mild_warm": "Dag - Mild", "temp_woonkamer_nacht_fris": "Nacht - Fris", "temp_woonkamer_nacht_koud": "Nacht - Koud", "temp_woonkamer_nacht_mild_warm": "Nacht - Mild" } },
+      "sp_badkamer": { "title": "Setpoints: Badkamer", "data": { "temp_badkamer_afwezig": "Afwezig", "temp_badkamer_voorverwarming": "Voorverwarming", "temp_badkamer_dag_fris": "Dag - Fris", "temp_badkamer_dag_koud": "Dag - Koud", "temp_badkamer_dag_mild_warm": "Dag - Mild", "temp_badkamer_nacht_fris": "Nacht - Fris", "temp_badkamer_nacht_koud": "Nacht - Koud", "temp_badkamer_nacht_mild_warm": "Nacht - Mild" } },
+      "sp_keuken": { "title": "Setpoints: Keuken", "data": { "temp_keuken_afwezig": "Afwezig", "temp_keuken_voorverwarming": "Voorverwarming", "temp_keuken_dag_fris": "Dag - Fris", "temp_keuken_dag_koud": "Dag - Koud", "temp_keuken_dag_mild_warm": "Dag - Mild", "temp_keuken_nacht_fris": "Nacht - Fris", "temp_keuken_nacht_koud": "Nacht - Koud", "temp_keuken_nacht_mild_warm": "Nacht - Mild" } },
+      "sp_sk1": { "title": "Setpoints: Slaapkamer 1", "data": { "temp_slaapkamer_1_afwezig": "Afwezig", "temp_slaapkamer_1_voorverwarming": "Voorverwarming", "temp_slaapkamer_1_dag_fris": "Dag - Fris", "temp_slaapkamer_1_dag_koud": "Dag - Koud", "temp_slaapkamer_1_dag_mild_warm": "Dag - Mild", "temp_slaapkamer_1_nacht_fris": "Nacht - Fris", "temp_slaapkamer_1_nacht_koud": "Nacht - Koud", "temp_slaapkamer_1_nacht_mild_warm": "Nacht - Mild" } },
+      "sp_sk2": { "title": "Setpoints: Slaapkamer 2", "data": { "temp_slaapkamer_2_afwezig": "Afwezig", "temp_slaapkamer_2_voorverwarming": "Voorverwarming", "temp_slaapkamer_2_dag_fris": "Dag - Fris", "temp_slaapkamer_2_dag_koud": "Dag - Koud", "temp_slaapkamer_2_dag_mild_warm": "Dag - Mild", "temp_slaapkamer_2_nacht_fris": "Nacht - Fris", "temp_slaapkamer_2_nacht_koud": "Nacht - Koud", "temp_slaapkamer_2_nacht_mild_warm": "Nacht - Mild" } },
+      "sp_sk3": { "title": "Setpoints: Slaapkamer 3", "data": { "temp_slaapkamer_3_afwezig": "Afwezig", "temp_slaapkamer_3_voorverwarming": "Voorverwarming", "temp_slaapkamer_3_dag_fris": "Dag - Fris", "temp_slaapkamer_3_dag_koud": "Dag - Koud", "temp_slaapkamer_3_dag_mild_warm": "Dag - Mild", "temp_slaapkamer_3_nacht_fris": "Nacht - Fris", "temp_slaapkamer_3_nacht_koud": "Nacht - Koud", "temp_slaapkamer_3_nacht_mild_warm": "Nacht - Mild" } }
+    },
+    "error": {
+      "unknown": "Een onverwachte fout is opgetreden."
+    }
+  },
+  "platform": {
+    "sensor": {
+      "name": "ClimaCore Platform Sensor"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "current_scenario": {
+        "name": "ClimaCore Huidig Scenario"
+      }
+    }
+  }
+}

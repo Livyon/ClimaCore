@@ -1,0 +1,62 @@
+blueprint:
+  name: "ClimaCore Pro: Google Maps API Beheer"
+  description: >-
+    Beheert de `sensor.google_travel_time` om API-aanroepen te minimaliseren en kosten te besparen.
+    Deze blueprint wordt elke 5 minuten uitgevoerd, maar roept de Google Maps API (via 'homeassistant.update_entity') 
+    alleen aan als de geselecteerde persoon 'not_home' is OF als de 'Onderweg naar Huis' modus actief is.
+
+    VEREIST: Een correct geconfigureerde 'google_travel_time' sensor.
+  domain: automation
+  input:
+    person_entity:
+      name: Persoon
+      description: "Selecteer de persoon wiens status ('home'/'not_home') moet bepalen of de update moet draaien."
+      selector:
+        entity:
+          domain: person
+
+    preheat_boolean:
+      name: "Doel (Onderweg naar Huis) Boolean"
+      description: "Selecteer de 'input_boolean' die ook kan forceren dat de reistijd wordt bijgewerkt (bv. input_boolean.onderweg_naar_huis)."
+      selector:
+        entity:
+          domain: input_boolean
+
+    target_sensor:
+      name: Google Maps Reistijd Sensor
+      description: "Selecteer de 'sensor.google_travel_time' entiteit die moet worden bijgewerkt."
+      selector:
+        entity:
+          integration: google_travel_time
+          domain: sensor
+
+# Dit is de automatisering-logica
+trigger:
+  # Trigger elke 5 minuten
+  - platform: time_pattern
+    minutes: "/5"
+  # Trigger ook direct als de persoon het huis verlaat
+  - platform: state
+    entity_id: !input person_entity
+    from: "home"
+    to: "not_home"
+
+condition:
+  # Voorwaarde: Voer alleen uit als de persoon 'not_home' IS...
+  - condition: or
+    conditions:
+      - condition: state
+        entity_id: !input person_entity
+        state: "not_home"
+      # ...OF als de 'onderweg naar huis' boolean 'on' staat.
+      - condition: state
+        entity_id: !input preheat_boolean
+        state: "on"
+
+action:
+  # Update de Google Maps sensor
+  - service: homeassistant.update_entity
+    target:
+      entity_id: !input target_sensor
+
+mode: single
