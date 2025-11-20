@@ -2,10 +2,10 @@
     "domain": "climacore",
     "name": "ClimaCore",
     "version": "1.5.7",
-    "documentation": "https://github.com/jouw-github/climacore",
-    "issue_tracker": "https://github.com/jouw-github/climacore/issues",
+    "documentation": "https://github.com/Livyon/ClimaCore",
+    "issue_tracker": "https://github.com/Livyon/ClimaCore/issues",
     "config_flow": true,
-    "codeowners": ["https://github.com/Livyon/Livyon"],
+    "codeowners": ["@Livyon"],
     "dependencies": ["http"],
     "requirements": ["requests"],
     "iot_class": "cloud_polling"
