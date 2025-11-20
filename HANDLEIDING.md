@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="custom_components/climacore/assets/logo.png" alt="ClimaCore Logo" width="400">
+  <img src="custom_components/climacore/assets/logo_readme.png" alt="ClimaCore Logo" width="400">
 </p>
 
 <h1 align="center">📘 ClimaCore: Installatie & Gebruikersgids</h1>
