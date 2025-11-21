@@ -1,91 +1,181 @@
-climacore_theme:
+climacore_dynamic_background_theme:
   # ===================================================================
-  # 1. CORE KLEUREN (POWER & CONTRAST)
+  # 1. CARD-MOD INTEGRATIE (DYNAMISCHE ACHTERGROND & POP-UPS)
   # ===================================================================
-
-  # PRIMARY: Geen lichtblauw meer, maar 'Deep Tech Teal'.
-  # Dit is een donkere, professionele kleur voor sliders/randen.
-  primary-color: "#009688"
-
-  # ACTIVE: 'Safety Orange'. Alles wat aan staat, knalt eruit.
-  active-state-color: "#FF6D00"
-
-  # --- Achtergronden (DE BELANGRIJKSTE WIJZIGING) ---
-
-  # 1. Fallback: Massief donkergrijs (bijna zwart)
-  primary-background-color: "#121212"
-
-  # 2. Kaart Achtergrond: 'Heavy Armor'
-  #    We gaan naar 90% dekking (0.9).
-  #    Hierdoor zie je de kleur van de achtergrond NIET meer
-  #    door de kaart heen lekken (dus geen blauwe waas).
-  secondary-background-color: "rgba(18, 18, 18, 0.90)"
-
-  # ===================================================================
-  # 2. UI ELEMENTEN
-  # ===================================================================
-
-  # --- Merk-kleuren ---
-  ha-color-primary: "var(--primary-color)"
-  ha-color-primary-40: "var(--primary-color)"
-  mdc-theme-primary: "var(--primary-color)"
-
-  # Actieve statussen (Oranje)
-  state-active-color: "var(--active-state-color)"
-  switch-checked-color: "var(--active-state-color)"
-
-  # Thermostaat Logic
-  climate-color-setpoint: "var(--active-state-color)"
-  state-climate-heat-color: "var(--active-state-color)"
-  state-climate-cool-color: "#009688" # De Deep Teal voor koelen
-  state-climate-idle-color: "#455A64" # Donkergrijs staal voor idle
-
-  # --- Text (Altijd Wit voor maximaal contrast) ---
-  primary-text-color: "#FFFFFF"
-  secondary-text-color: "#B0BEC5"
-
-  # --- Grenzen & Kaders ---
-  # Inactieve lijnen zijn donkergrijs, niet blauw.
-  input-idle-border-color: "#424242"
-  input-active-border-color: "var(--active-state-color)"
-
-  # --- Knoppen ---
-  paper-toggle-button-checked-button-color: "var(--active-state-color)"
-  paper-toggle-button-checked-bar-color: "rgba(255, 109, 0, 0.3)"
-  paper-slider-knob-color: "var(--active-state-color)"
-  paper-slider-pin-color: "var(--active-state-color)"
-
-  # --- Iconen ---
-  paper-item-icon-active-color: "var(--active-state-color)"
-  icon-active-color: "var(--active-state-color)"
-  state-icon-color: "#78909C" # Neutraal grijsblauw (meer grijs dan blauw)
-
-  # --- Card Styling ---
-  ha-card-background: "var(--secondary-background-color)"
-  card-background-color: "var(--secondary-background-color)"
-
-  # Scherpe, technische randen
-  ha-card-border-width: "1px"
-  ha-card-border-color: "rgba(255,255,255,0.08)"
-  ha-card-box-shadow: "0px 4px 8px rgba(0,0,0,0.4)" # Diepere schaduw voor 'zwevend' effect
-
-  bubble-main-background-color: "var(--secondary-background-color)"
-  sidebar-background-color: "#101010"
-
-  # ===================================================================
-  # 3. CARD-MOD
-  # ===================================================================
-  card-mod-theme: climacore_theme
+  card-mod-theme: climacore_dynamic_background_theme
   card-mod-view-yaml: |
     .: |
-      hui-masonry-view, hui-sidebar-view, hui-sections-view, hui-panel-view {
-        background: center / cover no-repeat fixed url("{{ states('sensor.climacore_background_url') }}") #121212 !important;
-        height: 100%; 
+      /* 1. De Dynamische Achtergrond */
+      hui-masonry-view, hui-sidebar-view, hui-sections-view, hui-panel-view, hui-view {
+        background: center / cover no-repeat fixed url("{{ states('sensor.climacore_background_url') }}") #161616 !important;
+        min-height: 100vh;
       }
-      ha-card {
-        background: var(--secondary-background-color) !important;
-        /* Geen blur meer nodig omdat de kaart donkerder is, 
-           dit maakt de interface 'scherper' */
-        backdrop-filter: none; 
-        border: 1px solid rgba(255,255,255,0.08) !important;
+
+      /* 2. De Header (Transparant met blur) */
+      app-header {
+        background-color: rgba(22, 22, 22, 0.7) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
       }
+      app-toolbar {
+        background: transparent !important;
+      }
+
+      /* 3. BUBBLE POP-UP TRANSPARANTIE (DE FIX) */
+      bubble-pop-up {
+        backdrop-filter: blur(20px);           /* Zorgt voor het wazige effect erachter */
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      bubble-pop-up ha-card {
+        /* AANGEPAST: 0.40 zorgt voor sterke transparantie (glas effect) */
+        /* Wil je het donkerder? Verhoog naar 0.60 of 0.70 */
+        background: rgba(22, 22, 22, 0.1) !important;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Mooie diepe schaduw */
+      }
+
+  # ===================================================================
+  # 2. ORIGINELE THEMA INSTELLINGEN
+  # ===================================================================
+
+  # Maak de standaard HA achtergrond transparant zodat Card-mod werkt
+  background-image: "none"
+  background-color: "rgba(0,0,0,0)"
+  ha-background-image: "none"
+  ha-background-color: "rgba(0,0,0,0)"
+
+  #--------------------------------------------------
+  #-- Kleurenpalet --#
+  primary-color: "#B87333" # Hoofd interactie kleur (Koper/Roest accent)
+  light-primary-color: "#D49A6A"
+  primary-background-color: "#161616"
+  secondary-background-color: "rgba(22, 22, 22, 0.4)" # Dit blijft donker voor je DASHBOARD kaarten
+  divider-color: "rgba(255, 255, 255, 0.1)"
+  active-state-color: "#F9AB00"
+
+  # Nieuwe variabelen voor algemene achtergrond
+  card-background-color: "var(--secondary-background-color)"
+
+  # Nieuwe variabelen voor consistentie
+  rgb-primary-color: 184, 115, 51
+  rgb-light-primary-color: 212, 154, 106
+  rgb-primary-background-color: 22, 22, 22
+  rgb-secondary-background-color: 0, 0, 0, 0.25
+  rgb-card-background-color: "var(--rgb-secondary-background-color)"
+  rgb-divider-color: 255, 255, 255, 0.1
+  rgb-active-state-color: 249, 171, 0
+
+  # Bubble Card standaardkleur
+  bubble-default-color: "var(--primary-color)"
+
+  #-- Tekst --#
+  primary-text-color: "#FFFFFF"
+  secondary-text-color: "#CCCCCC"
+  text-primary-color: "var(--primary-text-color)"
+  text-secondary-color: "var(--secondary-text-color)"
+  disabled-text-color: "#777777"
+
+  # Nieuwe tekstvariabelen voor consistentie
+  rgb-primary-text-color: 255, 255, 255
+  rgb-secondary-text-color: 204, 204, 204
+  rgb-disabled-text-color: 119, 119, 119
+
+  #-- Header & Navigatie --#
+  app-header-background-color: "rgba(0,0,0,0)"
+  app-header-text-color: "var(--primary-text-color)"
+  app-header-border-bottom: "none"
+  "--accent-color": "var(--primary-color)"
+
+  #-- Kaarten --#
+  ha-card-background: "var(--card-background-color)"
+  ha-card-border-radius: "16px"
+  ha-card-box-shadow: "none"
+  ha-card-border-width: "0px"
+  ha-card-border-color: "var(--divider-color)"
+  paper-card-header-color: "var(--primary-text-color)"
+  paper-card-background-color: "var(--secondary-background-color)"
+
+  #-- Sidebar --#
+  sidebar-icon-color: "var(--secondary-text-color)"
+  sidebar-text-color: "var(--secondary-text-color)"
+  sidebar-selected-background-color: "rgba(255, 255, 255, 0.1)"
+  sidebar-selected-icon-color: "var(--primary-color)"
+  sidebar-selected-text-color: "var(--primary-text-color)"
+  sidebar-background-color: "var(--primary-background-color)"
+  sidebar-hover-color: "var(--sidebar-selected-background-color)"
+
+  #-- Iconen & Badges --#
+  paper-item-icon-color: "var(--secondary-text-color)"
+  paper-item-icon-active-color: "var(--primary-text-color)"
+  state-icon-color: "var(--paper-item-icon-color)"
+  state-icon-active-color: "var(--primary-text-color)"
+  label-badge-background-color: "var(--secondary-background-color)"
+  label-badge-text-color: "var(--primary-text-color)"
+  paper-icon-button-active-color: "var(--active-state-color)"
+  paper-icon-button-color: "var(--secondary-text-color)"
+  icon-color: "var(--secondary-text-color)"
+  icon-active-color: "var(--primary-text-color)"
+
+  #-- Knoppen & Schakelaars --#
+  paper-slider-knob-color: "var(--active-state-color)"
+  paper-slider-active-color: "var(--active-state-color)"
+  paper-slider-pin-color: "var(--active-state-color)"
+  paper-slider-secondary-color: "var(--divider-color)"
+  paper-toggle-button-checked-button-color: "var(--active-state-color)"
+  paper-toggle-button-checked-bar-color: "rgba(249, 171, 0, 0.1)"
+  paper-toggle-button-unchecked-button-color: "#999999"
+  paper-toggle-button-unchecked-bar-color: "rgba(255, 255, 255, 0.1)"
+  switch-checked-color: "var(--active-state-color)"
+  switch-unchecked-color: "#999999"
+  button-primary-color: "var(--primary-color)"
+  button-text-color: "var(--primary-text-color)"
+
+  #-- Input Velden --#
+  input-fill-color: "var(--secondary-background-color)"
+  input-ink-color: "var(--primary-text-color)"
+  input-label-ink-color: "var(--secondary-text-color)"
+  input-disabled-fill-color: "var(--secondary-background-color)"
+  input-disabled-ink-color: "var(--disabled-text-color)"
+
+  input-dropdown-color: "var(--primary-text-color)"
+  input-dropdown-icon-color: "var(--secondary-text-color)"
+  input-label-color: "var(--secondary-text-color)"
+  input-border-color: "var(--divider-color)"
+  input-active-border-color: "var(--primary-color)"
+
+  #-- Codering & Markdown --#
+  markdown-code-background-color: "var(--secondary-background-color)"
+
+  #-- Bubble Card Styling Overrides --#
+  bubble-border-radius: "16px"
+  bubble-main-background-color: "var(--secondary-background-color)"
+  bubble-pop-up-main-background-color: "rgba(0, 0, 0, 0.0)"
+  bubble-accent-color: "var(--active-state-color)"
+  bubble-icon-background-color: "rgba(255, 255, 255, 0.1)"
+  bubble-select-list-background-color: "var(--secondary-background-color)"
+  bubble-horizontal-buttons-stack-background-color: "var(--secondary-background-color)"
+  bubble-horizontal-buttons-stack-border-radius: "16px"
+
+  #--------------------------------------------------
+  # **NIEUW** - Overschrijven van Material Design 3-kleuren
+  #--------------------------------------------------
+  ha-color-primary: "var(--primary-color)"
+  ha-color-primary-40: "var(--primary-color)"
+  ha-color-primary-50: "var(--light-primary-color)"
+  ha-color-primary-60: "var(--light-primary-color)"
+  ha-color-primary-80: "var(--light-primary-color)"
+  ha-color-primary-90: "#E6C9B0"
+
+  ha-color-accent: "var(--active-state-color)"
+  ha-color-orange-40: "var(--active-state-color)"
+  ha-color-orange-50: "var(--active-state-color)"
+  ha-color-orange-60: "var(--active-state-color)"
+
+  ha-color-text-primary: "var(--primary-text-color)"
+  ha-color-text-secondary: "var(--secondary-text-color)"
+  ha-color-text-disabled: "var(--disabled-text-color)"
+
+  ha-selected-menu-item-icon-color: "var(--primary-color)"
+  ha-selected-menu-item-text-color: "var(--primary-text-color)"
