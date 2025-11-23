@@ -65,7 +65,7 @@ ClimaCore komt met een prachtig, kant-en-klaar dashboard gebaseerd op **Bubble C
 * **♻️ Slimme Afvalkalender:**
     Detecteert automatisch uw afval-integratie (RecycleApp, Afvalwijzer, etc.) en toont de eerstvolgende ophaaldatum.
 
-![Dashboard Info](custom_components/images/dashboard_info.png)
+![Dashboard Info](custom_components/images/dashboard_info..png)
 *(Info Tab: Automatische detectie van problemen)*
 
 ---
