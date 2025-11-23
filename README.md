@@ -49,7 +49,7 @@ Geen koude thuiskomst meer, en nooit meer stoken voor een leeg huis.
 
 ClimaCore komt met een prachtig, kant-en-klaar dashboard gebaseerd op **Bubble Card**. Het is ontworpen voor snelheid, overzicht en gebruiksgemak op zowel telefoons als tablets.
 
-![Dashboard Home](images/dashboard_home.png)
+![Dashboard Home](custom_components/images/dashboard_home..png)
 *(Startscherm: Strak, overzichtelijk en taakgericht)*
 
 ### 🚀 Unieke Dashboard Features
@@ -65,7 +65,7 @@ ClimaCore komt met een prachtig, kant-en-klaar dashboard gebaseerd op **Bubble C
 * **♻️ Slimme Afvalkalender:**
     Detecteert automatisch uw afval-integratie (RecycleApp, Afvalwijzer, etc.) en toont de eerstvolgende ophaaldatum.
 
-![Dashboard Info](images/dashboard_info.png)
+![Dashboard Info](custom_components/images/dashboard_info.png)
 *(Info Tab: Automatische detectie van problemen)*
 
 ---
