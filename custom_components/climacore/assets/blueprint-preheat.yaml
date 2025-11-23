@@ -1,60 +1,59 @@
 blueprint:
-  name: "ClimaCore: Slimme Voorverwarming (Pro)"
-  description: >-
-    De complete intelligentie:
-    1. Controleert afstand/reistijd.
-    2. Controleert of het KOUD genoeg is (buiten én binnen).
-    3. Spreekt een bericht uit (TTS) via de telefoon/auto.
-    4. Toont knoppen om de verwarming te starten.
-    5. Reset de status automatisch bij thuiskomst.
+  name: ClimaCore - Slimme Voorverwarming (Pro v4 Intelligent)
+  description: >
+    Stuurt een melding als de auto start (Android/iOS) en je onderweg naar huis bent.
+    Bevat slimme filters: vraagt ALLEEN als het koud is (binnen/buiten).
   domain: automation
   input:
     # --- SENSOREN ---
     car_connection_sensor:
-      name: Auto Verbonden Sensor
-      description: "De 'binary_sensor' die 'on' gaat als je telefoon verbindt met je auto."
+      name: Auto Detectie Sensor
+      description: >
+        De sensor die ziet dat je rijdt.
+        Android: binary_sensor...android_auto
+        iOS: sensor...activity (Automotive) OF binary_sensor...focus_driving
       selector:
         entity:
-          domain: binary_sensor
-
+          domain: 
+            - binary_sensor
+            - sensor
+    
     travel_time_sensor:
-      name: Reistijd/Afstand Sensor
-      description: "De sensor die de reistijd (min) of afstand (km) naar huis meet."
+      name: Reistijd Sensor (Waze/Google)
+      description: Sensor die de reistijd in minuten aangeeft.
       selector:
         entity:
           domain: sensor
+          device_class: duration
 
-    travel_time_threshold:
-      name: Drempelwaarde (Afstand/Tijd)
-      description: "Activeer alleen als de waarde lager is dan dit getal."
-      default: 20
-      selector:
-        number:
-          min: 1
-          max: 100
-          mode: box
-
-    # --- TEMPERATUUR LOGICA ---
     weather_entity:
-      name: Weer Entiteit (Buiten)
+      name: Weerbericht (Buitentemperatuur)
+      description: Entiteit voor de buitentemperatuur (bijv. weather.forecast_thuis).
       selector:
         entity:
           domain: weather
+
+    climate_entity:
+      name: Thermostaat (Binnentemperatuur)
+      description: De thermostaat om de binnentemperatuur te checken.
+      selector:
+        entity:
+          domain: climate
+
+    # --- INSTELLINGEN ---
     outdoor_threshold:
-      name: Buitentemperatuur Drempel
+      name: Buitentemperatuur Grens
+      description: Stuur GEEN melding als het buiten warmer is dan dit (standaard 18°C).
       default: 18
       selector:
         number:
           min: 0
-          max: 25
+          max: 30
           unit_of_measurement: "°C"
-    climate_entity:
-      name: Thermostaat (Binnen)
-      selector:
-        entity:
-          domain: climate
+
     indoor_threshold:
-      name: Binnentemperatuur Drempel
+      name: Binnentemperatuur Grens
+      description: Stuur GEEN melding als het binnen al warmer is dan dit (standaard 21°C).
       default: 21
       selector:
         number:
@@ -62,129 +61,158 @@ blueprint:
           max: 25
           unit_of_measurement: "°C"
 
-    # --- DOELEN ---
-    person_entities:
-      name: Personen
-      description: "Selecteer de personen. Vraag wordt alleen gesteld als NIEMAND thuis is."
-      selector:
-        entity:
-          domain: person
-          multiple: true
-
     target_boolean:
-      name: "Doel (Onderweg naar Huis) Boolean"
-      description: "De ClimaCore input_boolean die geschakeld moet worden."
+      name: Helper "Onderweg naar Huis"
+      description: De schakelaar die AAN gaat als je "Ja" zegt.
       selector:
         entity:
           domain: input_boolean
 
-    notify_device:
-      name: Notificatie Apparaat
-      description: "Het mobiele apparaat dat de vraag ontvangt."
+    notify_service:
+      name: Notificatie Service
+      description: >
+        De exacte naam van de service voor jouw telefoon.
+        Bijv: notify.mobile_app_telefoon_kyle
       selector:
-        device:
-          integration: mobile_app
+        text:
+          multiline: false
+          type: text
+
+    # --- PERSONEN ---
+    person_entity_1:
+      name: Persoon 1 (Bewoner)
+      selector:
+        entity:
+          domain: person
+    
+    person_entity_2:
+      name: Persoon 2 (Optioneel)
+      default: []
+      selector:
+        entity:
+          domain: person
 
 trigger:
+  # Trigger 1: Android Auto / iOS Focus (Binary: gaat naar ON)
   - platform: state
     entity_id: !input car_connection_sensor
-    from: "off"
     to: "on"
     id: "auto_start"
 
+  # Trigger 2: iOS Activity Sensor (String: gaat naar Automotive)
   - platform: state
-    entity_id: !input person_entities
+    entity_id: !input car_connection_sensor
+    to: "Automotive"
+    id: "auto_start"
+    
+  # Trigger 3: iOS Activity Sensor (Engels/Nederlands variaties)
+  - platform: state
+    entity_id: !input car_connection_sensor
+    to: "Driving"
+    id: "auto_start"
+
+  # Trigger 4: Iemand komt thuis (Resetten)
+  - platform: state
+    entity_id: !input person_entity_1
+    to: "home"
+    id: "thuiskomst"
+  - platform: state
+    entity_id: !input person_entity_2
     to: "home"
     id: "thuiskomst"
 
 action:
   - choose:
-      # --- SCENARIO 1: AUTO START ---
+      # SCENARIO 1: VERTREKKEN (Auto start + Niemand thuis + Het is koud)
       - conditions:
           - condition: trigger
             id: "auto_start"
+          
+          # 1. Ben je niet thuis?
           - condition: state
-            entity_id: !input person_entities
+            entity_id: !input person_entity_1
             state: "not_home"
+          - condition: or
+            conditions:
+              - condition: template
+                value_template: "{{ person_entity_2 == [] }}"
+              - condition: state
+                entity_id: !input person_entity_2
+                state: "not_home"
+          
+          # 2. Zijn we niet al onderweg?
           - condition: state
             entity_id: !input target_boolean
             state: "off"
+          
+          # 3. Is het de moeite? (Reistijd > 8 min)
           - condition: numeric_state
             entity_id: !input travel_time_sensor
-            below: !input travel_time_threshold
+            above: 8
+            below: 120 # Max 2 uur rijden, anders te vroeg
+          
+          # 4. INTELLIGENTIE: Is het buiten koud genoeg?
           - condition: numeric_state
             entity_id: !input weather_entity
             attribute: temperature
             below: !input outdoor_threshold
+          
+          # 5. INTELLIGENTIE: Is het binnen koud genoeg?
           - condition: numeric_state
             entity_id: !input climate_entity
             attribute: current_temperature
             below: !input indoor_threshold
-
+        
         sequence:
-          # STAP 1: TTS BERICHT (SPRAAK)
-          # Dit zorgt ervoor dat de telefoon/auto spreekt.
-          - device_id: !input notify_device
-            domain: mobile_app
-            type: notify
-            title: "Onderweg naar huis?"
-            message: "TTS"
+          # Stuur bericht
+          - service: !input notify_service
             data:
-              tts_text: "Ik zie dat je dicht bij huis bent en het is fris. Moet ClimaCore de verwarming starten?"
-              media_stream: "media_stream_medium"
-              priority: "high"
-              ttl: 0
-
-          # STAP 2: INTERACTIEVE NOTIFICATIE (KNOPPEN)
-          # Dit toont de knoppen op het scherm.
-          - device_id: !input notify_device
-            domain: mobile_app
-            type: notify
-            title: "Onderweg naar huis?"
-            message: "Het is fris thuis. Verwarming starten?"
-            data:
-              actions:
-                - action: "CLIMACORE_PREHEAT_YES"
-                  title: "Ja"
-                - action: "CLIMACORE_PREHEAT_NO"
-                  title: "Nee"
-
-          # STAP 3: WACHT OP ANTWOORD
+              title: "Onderweg naar huis?"
+              message: "Het is fris thuis. Zal ik de verwarming alvast starten?"
+              data:
+                ttl: 0
+                priority: high
+                actions:
+                  - action: "CLIMACORE_YES"
+                    title: "Ja, graag"
+                  - action: "CLIMACORE_NO"
+                    title: "Nee"
+          
+          # Wacht op antwoord (10 min)
           - wait_for_trigger:
               - platform: event
                 event_type: mobile_app_notification_action
                 event_data:
-                  action: "CLIMACORE_PREHEAT_YES"
+                  action: "CLIMACORE_YES"
               - platform: event
                 event_type: mobile_app_notification_action
                 event_data:
-                  action: "CLIMACORE_PREHEAT_NO"
-            timeout: "00:05:00"
+                  action: "CLIMACORE_NO"
+            timeout: "00:10:00"
             continue_on_timeout: false
-
-          # STAP 4: VERWERK ANTWOORD
+          
+          # Verwerk antwoord
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ wait.trigger.event.data.action == 'CLIMACORE_PREHEAT_YES' }}"
+                    value_template: "{{ wait.trigger.event.data.action == 'CLIMACORE_YES' }}"
                 sequence:
                   - service: input_boolean.turn_on
                     target:
                       entity_id: !input target_boolean
-                  - service: persistent_notification.create
+                  - service: !input notify_service
                     data:
-                      title: "ClimaCore"
-                      message: "Top, de verwarming gaat aan!"
-
+                      message: "Top! De verwarming gaat aan."
+              
               - conditions:
                   - condition: template
-                    value_template: "{{ wait.trigger.event.data.action == 'CLIMACORE_PREHEAT_NO' }}"
+                    value_template: "{{ wait.trigger.event.data.action == 'CLIMACORE_NO' }}"
                 sequence:
-                  - service: input_boolean.turn_off
-                    target:
-                      entity_id: !input target_boolean
+                  - service: !input notify_service
+                    data:
+                      message: "Oké, ik doe niets."
 
-      # --- SCENARIO 2: THUISKOMST (Reset) ---
+      # SCENARIO 2: THUISKOMST (Reset de knop)
       - conditions:
           - condition: trigger
             id: "thuiskomst"
@@ -195,9 +223,3 @@ action:
           - service: input_boolean.turn_off
             target:
               entity_id: !input target_boolean
-          - service: persistent_notification.create
-            data:
-              title: "ClimaCore"
-              message: "Welkom thuis! Onderweg-modus gereset."
-
-mode: queued
