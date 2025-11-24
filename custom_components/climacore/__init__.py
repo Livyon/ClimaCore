@@ -103,6 +103,7 @@ class ClimaCoreCoordinator:
         self._listeners = []
         self._entity_registry: EntityRegistry | None = None
         self._is_running = False
+        self._boost_window = None
 
     @callback
     def cleanup_listeners(self) -> None:
@@ -176,6 +177,18 @@ class ClimaCoreCoordinator:
     def _build_main_logic_payload(self, trigger_entity_id: str | None = None) -> dict:
         config_data = {key: value for key, value in self.options.items() if key.startswith("temp_")}
         config_data["fallback_temp"] = self.options.get("fallback_temp", 18.0)
+
+        nu = dt_util.now()
+        simulated_time_str = nu.strftime('%H:%M:%S')
+        
+        if self._boost_window:
+            if self._boost_window["start"] <= nu < self._boost_window["end"]:
+                # We zitten in de 'Opwarmfase'. We vertellen de API dat het al ochtend is.
+                simulated_time_str = self._boost_window["end"].strftime('%H:%M:%S')
+                _LOGGER.info(f"BOOST ACTIEF: A.I. berekende voorverwarming. Ik simuleer tijdstip {simulated_time_str}.")
+            
+            elif nu >= self._boost_window["end"]:
+                self._boost_window = None # Ochtend is bereikt, normaal schema hervatten
         
         context_data = {
             "current_time": dt_util.now().strftime('%H:%M:%S'),
@@ -318,6 +331,18 @@ class ClimaCoreCoordinator:
                 trigger_entity_id = event.data.get("entity_id")
             except Exception:
                 _LOGGER.debug("Kon trigger entity_id niet vinden in args")
+            
+        # --- NIEUW: Filter onnodige GPS-updates (Jitter) ---
+        # Dit voorkomt dat de logica draait als je GPS verspringt maar je gewoon thuis blijft.
+        if trigger_entity_id and trigger_entity_id.startswith("person."):
+            old_state = event.data.get("old_state")
+            new_state = event.data.get("new_state")
+            
+            # Als er een oude en nieuwe status is, en ze zijn TEXTUEEL hetzelfde (bijv. 'home' == 'home')
+            # Dan is het waarschijnlijk alleen een attribuut wijziging (GPS, foto, batterij).
+            if old_state and new_state and old_state.state == new_state.state:
+                _LOGGER.debug(f"Persoon trigger {trigger_entity_id} genegeerd: Alleen GPS/Nauwkeurigheid veranderd, status blijft '{new_state.state}'.")
+                return
 
         # --- NIEUWE RAAMSENSOR DEBOUNCE-LOGICA ---
         # 1. Controleer of de trigger een raamsensor is
@@ -426,7 +451,15 @@ class ClimaCoreCoordinator:
                 return
 
             _LOGGER.info(f"Dynamische trigger ingesteld om hoofdlogica te starten om {start_datetime.isoformat()}")
+
+            target_str = self.options.get("proactive_target_time", "06:00:00")
+            target_time = time.fromisoformat(target_str)
+            target_datetime = dt_util.as_local(dt_util.dt.datetime.combine(vandaag, target_time))
             
+            self._boost_window = {
+                "start": start_datetime,
+                "end": target_datetime
+            }
             async_track_time_change(
                 self.hass, self.async_trigger_main_logic, 
                 hour=start_datetime.hour, 
