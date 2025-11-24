@@ -148,7 +148,8 @@ class ClimaCoreCoordinator:
         self._listeners.append(async_track_time_change(self.hass, self.async_trigger_main_logic, hour=23, minute=0, second=0))
         self._listeners.append(async_track_time_change(self.hass, self.async_trigger_main_logic, hour=4, minute=59, second=59))
         self._listeners.append(async_track_time_change(self.hass, self.async_trigger_proactive_start, hour=4, minute=0, second=0))
-        
+        self._listeners.append(async_track_time_interval(self.hass, self.async_trigger_main_logic, dt_util.dt.timedelta(minutes=10)))
+
         _LOGGER.debug("Alle listeners zijn geregistreerd.")
 
     def _get_state(self, entity_id: str) -> str | None:
@@ -316,21 +317,29 @@ class ClimaCoreCoordinator:
         _LOGGER.debug(f"ClimaCore Hoofdlogica getriggerd door: {args}")
         
         trigger_entity_id = None
+        event = None
+        old_state_obj = None
+        new_state_obj = None
+
         if args:
             try:
-                event = args[0]
-                trigger_entity_id = event.data.get("entity_id")
+                # Probeer event data te parsen als het een event is
+                if len(args) > 0 and hasattr(args[0], "data"):
+                    event = args[0]
+                    trigger_entity_id = event.data.get("entity_id")
+                    old_state_obj = event.data.get("old_state")
+                    new_state_obj = event.data.get("new_state")
+                # Anders is het waarschijnlijk een tijd-trigger (geen entity_id)
             except Exception:
-                _LOGGER.debug("Kon trigger entity_id niet vinden in args")
-            
+                _LOGGER.debug("Kon trigger details niet parsen (waarschijnlijk tijd-trigger).")
+
+        # --- JITTER FILTER (Ongewijzigd) ---
         if trigger_entity_id and trigger_entity_id.startswith("person."):
-            old_state = event.data.get("old_state")
-            new_state = event.data.get("new_state")
-            if old_state and new_state and old_state.state == new_state.state:
-                _LOGGER.debug(f"Persoon trigger {trigger_entity_id} genegeerd: Alleen GPS/Nauwkeurigheid veranderd, status blijft '{new_state.state}'.")
+            if old_state_obj and new_state_obj and old_state_obj.state == new_state_obj.state:
+                _LOGGER.debug(f"Persoon trigger {trigger_entity_id} genegeerd: Alleen GPS/Nauwkeurigheid veranderd.")
                 return
 
-        # --- RAAMSENSOR DEBOUNCE ---
+        # --- GECORRIGEERDE RAAM LOGICA ---
         is_window_trigger = False
         if trigger_entity_id:
             for i in range(1, 11):
@@ -340,13 +349,29 @@ class ClimaCoreCoordinator:
                     break
         
         if is_window_trigger:
-            _LOGGER.debug(f"Raamsensor {trigger_entity_id} gedetecteerd. Wacht 15 seconden voor 'debounce'...")
+            # Bepaal wat er gebeurde: Openen of Sluiten?
+            to_state = new_state_obj.state if new_state_obj else "unknown"
+            _LOGGER.debug(f"Raam {trigger_entity_id} ging naar '{to_state}'. Wacht 15s debounce...")
+            
             await asyncio.sleep(15)
-            sensor_state = self._get_state(trigger_entity_id)
-            if sensor_state == "off" or sensor_state == "closed":
-                _LOGGER.info(f"Raam {trigger_entity_id} is alweer gesloten binnen 15s. API-call geannuleerd.")
-                return 
-            _LOGGER.debug(f"Raam {trigger_entity_id} is nog steeds '{sensor_state}'. Doorgaan met API-call.")
+            
+            # Check de huidige live status
+            current_state = self._get_state(trigger_entity_id)
+            
+            # LOGICA: Is de staat veranderd tijdens het wachten?
+            # Bijv: Ging OPEN -> Wacht -> Is nu weer DICHT? -> Annuleer.
+            # Bijv: Ging DICHT -> Wacht -> Is nu weer OPEN? -> Annuleer.
+            
+            if to_state == "on" and current_state == "off":
+                _LOGGER.info(f"Debounce: Raam {trigger_entity_id} was even open, maar nu weer dicht. Genegeerd.")
+                return
+            
+            if to_state == "off" and current_state == "on":
+                _LOGGER.info(f"Debounce: Raam {trigger_entity_id} was even dicht, maar nu weer open. Genegeerd.")
+                return
+
+            _LOGGER.debug(f"Raam {trigger_entity_id} status bevestigd als '{current_state}'. Actie uitvoeren.")
+        # ----------------------------------
 
         if self._is_running:
             _LOGGER.warning("Trigger overgeslagen: ClimaCore is al bezig (anti-loop).")
