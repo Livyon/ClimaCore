@@ -118,6 +118,46 @@ views:
                         {{ ns.cards | sort(attribute='name') }}
               - type: custom:bubble-card
                 card_type: separator
+                name: Zonwering
+                icon: mdi:window-shutter
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  template: |
+                    {% set target_area = 'Gang' %}
+                    {% set ns = namespace(cards=[]) %}
+
+                    {% for cov in states.cover %}
+                      {% set entity_area = area_name(cov.entity_id) %}
+                      
+                      {% if entity_area and entity_area | string | lower | trim == target_area | lower | trim %}
+                        
+                        {% set dev_class = cov.attributes.device_class | default('unknown') %}
+                        
+                        {% if dev_class != 'garage' and dev_class != 'gate' %}
+                          
+                          {% set card_config = {
+                            'type': 'custom:bubble-card',
+                            'card_type': 'cover',
+                            'entity': cov.entity_id,
+                            'name': cov.name,
+                            'show_icon': true,
+                            'sub_button': []
+                          } %}
+                          
+                          {% set ns.cards = ns.cards + [card_config] %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    {{ ns.cards | sort(attribute='name') }}
+                show_empty: false
+              - type: custom:bubble-card
+                card_type: separator
                 name: Ramen & Deuren
                 icon: mdi:window-closed-variant
               - type: custom:auto-entities
@@ -290,6 +330,46 @@ views:
                         {{ ns.cards | sort(attribute='name') }}
               - type: custom:bubble-card
                 card_type: separator
+                name: Zonwering
+                icon: mdi:window-shutter
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  template: |
+                    {% set target_area = 'Woonkamer' %}
+                    {% set ns = namespace(cards=[]) %}
+
+                    {% for cov in states.cover %}
+                      {% set entity_area = area_name(cov.entity_id) %}
+                      
+                      {% if entity_area and entity_area | string | lower | trim == target_area | lower | trim %}
+                        
+                        {% set dev_class = cov.attributes.device_class | default('unknown') %}
+                        
+                        {% if dev_class != 'garage' and dev_class != 'gate' %}
+                          
+                          {% set card_config = {
+                            'type': 'custom:bubble-card',
+                            'card_type': 'cover',
+                            'entity': cov.entity_id,
+                            'name': cov.name,
+                            'show_icon': true,
+                            'sub_button': []
+                          } %}
+                          
+                          {% set ns.cards = ns.cards + [card_config] %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    {{ ns.cards | sort(attribute='name') }}
+                show_empty: false
+              - type: custom:bubble-card
+                card_type: separator
                 name: Ramen & Deuren
                 icon: mdi:window-closed-variant
               - type: custom:auto-entities
@@ -405,7 +485,7 @@ views:
                 card_param: cards
                 filter:
                   template: |
-                    {% set target_area = 'Keuken' %}   {# <--- AANPASSEN #}
+                    {% set target_area = 'Eetkamer' %}   {# <--- AANPASSEN #}
                         {% set ns = namespace(cards=[]) %}
                         
                         {# DIT IS DE NIEUWE TRUC: We maken de JS code als tekst #}
@@ -452,6 +532,46 @@ views:
                         
                         {# 4. Sorteer op naam #}
                         {{ ns.cards | sort(attribute='name') }}
+              - type: custom:bubble-card
+                card_type: separator
+                name: Zonwering
+                icon: mdi:window-shutter
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  template: |
+                    {% set target_area = 'Eetkamer' %}
+                    {% set ns = namespace(cards=[]) %}
+
+                    {% for cov in states.cover %}
+                      {% set entity_area = area_name(cov.entity_id) %}
+                      
+                      {% if entity_area and entity_area | string | lower | trim == target_area | lower | trim %}
+                        
+                        {% set dev_class = cov.attributes.device_class | default('unknown') %}
+                        
+                        {% if dev_class != 'garage' and dev_class != 'gate' %}
+                          
+                          {% set card_config = {
+                            'type': 'custom:bubble-card',
+                            'card_type': 'cover',
+                            'entity': cov.entity_id,
+                            'name': cov.name,
+                            'show_icon': true,
+                            'sub_button': []
+                          } %}
+                          
+                          {% set ns.cards = ns.cards + [card_config] %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    {{ ns.cards | sort(attribute='name') }}
+                show_empty: false
               - type: custom:bubble-card
                 card_type: separator
                 name: Ramen & Deuren
@@ -531,7 +651,7 @@ views:
               - type: custom:bubble-card
                 card_type: pop-up
                 hash: '#Keuken'
-                name: Woonkamer Bediening
+                name: Keuken Bediening
                 icon: mdi:chef-hat
                 margin_top_mobile: 56px
               - type: custom:bubble-card
@@ -618,6 +738,46 @@ views:
                         {{ ns.cards | sort(attribute='name') }}
               - type: custom:bubble-card
                 card_type: separator
+                name: Zonwering
+                icon: mdi:window-shutter
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  template: |
+                    {% set target_area = 'Keuken' %}
+                    {% set ns = namespace(cards=[]) %}
+
+                    {% for cov in states.cover %}
+                      {% set entity_area = area_name(cov.entity_id) %}
+                      
+                      {% if entity_area and entity_area | string | lower | trim == target_area | lower | trim %}
+                        
+                        {% set dev_class = cov.attributes.device_class | default('unknown') %}
+                        
+                        {% if dev_class != 'garage' and dev_class != 'gate' %}
+                          
+                          {% set card_config = {
+                            'type': 'custom:bubble-card',
+                            'card_type': 'cover',
+                            'entity': cov.entity_id,
+                            'name': cov.name,
+                            'show_icon': true,
+                            'sub_button': []
+                          } %}
+                          
+                          {% set ns.cards = ns.cards + [card_config] %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    {{ ns.cards | sort(attribute='name') }}
+                show_empty: false
+              - type: custom:bubble-card
+                card_type: separator
                 name: Ramen & Deuren
                 icon: mdi:window-closed-variant
               - type: custom:auto-entities
@@ -695,7 +855,7 @@ views:
               - type: custom:bubble-card
                 card_type: pop-up
                 hash: '#Badkamer'
-                name: Woonkamer Bediening
+                name: Badkamer Bediening
                 icon: mdi:shower
                 margin_top_mobile: 56px
               - type: custom:bubble-card
@@ -780,6 +940,46 @@ views:
                         
                         {# 4. Sorteer op naam #}
                         {{ ns.cards | sort(attribute='name') }}
+              - type: custom:bubble-card
+                card_type: separator
+                name: Zonwering
+                icon: mdi:window-shutter
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  template: |
+                    {% set target_area = 'Badkamer' %}
+                    {% set ns = namespace(cards=[]) %}
+
+                    {% for cov in states.cover %}
+                      {% set entity_area = area_name(cov.entity_id) %}
+                      
+                      {% if entity_area and entity_area | string | lower | trim == target_area | lower | trim %}
+                        
+                        {% set dev_class = cov.attributes.device_class | default('unknown') %}
+                        
+                        {% if dev_class != 'garage' and dev_class != 'gate' %}
+                          
+                          {% set card_config = {
+                            'type': 'custom:bubble-card',
+                            'card_type': 'cover',
+                            'entity': cov.entity_id,
+                            'name': cov.name,
+                            'show_icon': true,
+                            'sub_button': []
+                          } %}
+                          
+                          {% set ns.cards = ns.cards + [card_config] %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    {{ ns.cards | sort(attribute='name') }}
+                show_empty: false
               - type: custom:bubble-card
                 card_type: separator
                 name: Ramen & Deuren
@@ -947,6 +1147,46 @@ views:
                         {{ ns.cards | sort(attribute='name') }}
               - type: custom:bubble-card
                 card_type: separator
+                name: Zonwering
+                icon: mdi:window-shutter
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  template: |
+                    {% set target_area = 'Slaapkamer 1' %}
+                    {% set ns = namespace(cards=[]) %}
+
+                    {% for cov in states.cover %}
+                      {% set entity_area = area_name(cov.entity_id) %}
+                      
+                      {% if entity_area and entity_area | string | lower | trim == target_area | lower | trim %}
+                        
+                        {% set dev_class = cov.attributes.device_class | default('unknown') %}
+                        
+                        {% if dev_class != 'garage' and dev_class != 'gate' %}
+                          
+                          {% set card_config = {
+                            'type': 'custom:bubble-card',
+                            'card_type': 'cover',
+                            'entity': cov.entity_id,
+                            'name': cov.name,
+                            'show_icon': true,
+                            'sub_button': []
+                          } %}
+                          
+                          {% set ns.cards = ns.cards + [card_config] %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    {{ ns.cards | sort(attribute='name') }}
+                show_empty: false
+              - type: custom:bubble-card
+                card_type: separator
                 name: Ramen & Deuren
                 icon: mdi:window-closed-variant
               - type: custom:auto-entities
@@ -1109,6 +1349,46 @@ views:
                         
                         {# 4. Sorteer op naam #}
                         {{ ns.cards | sort(attribute='name') }}
+              - type: custom:bubble-card
+                card_type: separator
+                name: Zonwering
+                icon: mdi:window-shutter
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  template: |
+                    {% set target_area = 'Slaapkamer 2' %}
+                    {% set ns = namespace(cards=[]) %}
+
+                    {% for cov in states.cover %}
+                      {% set entity_area = area_name(cov.entity_id) %}
+                      
+                      {% if entity_area and entity_area | string | lower | trim == target_area | lower | trim %}
+                        
+                        {% set dev_class = cov.attributes.device_class | default('unknown') %}
+                        
+                        {% if dev_class != 'garage' and dev_class != 'gate' %}
+                          
+                          {% set card_config = {
+                            'type': 'custom:bubble-card',
+                            'card_type': 'cover',
+                            'entity': cov.entity_id,
+                            'name': cov.name,
+                            'show_icon': true,
+                            'sub_button': []
+                          } %}
+                          
+                          {% set ns.cards = ns.cards + [card_config] %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    {{ ns.cards | sort(attribute='name') }}
+                show_empty: false
               - type: custom:bubble-card
                 card_type: separator
                 name: Ramen & Deuren
@@ -1274,6 +1554,46 @@ views:
                         
                         {# 4. Sorteer op naam #}
                         {{ ns.cards | sort(attribute='name') }}
+              - type: custom:bubble-card
+                card_type: separator
+                name: Zonwering
+                icon: mdi:window-shutter
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  template: |
+                    {% set target_area = 'Hoofdslaapkamer' %}
+                    {% set ns = namespace(cards=[]) %}
+
+                    {% for cov in states.cover %}
+                      {% set entity_area = area_name(cov.entity_id) %}
+                      
+                      {% if entity_area and entity_area | string | lower | trim == target_area | lower | trim %}
+                        
+                        {% set dev_class = cov.attributes.device_class | default('unknown') %}
+                        
+                        {% if dev_class != 'garage' and dev_class != 'gate' %}
+                          
+                          {% set card_config = {
+                            'type': 'custom:bubble-card',
+                            'card_type': 'cover',
+                            'entity': cov.entity_id,
+                            'name': cov.name,
+                            'show_icon': true,
+                            'sub_button': []
+                          } %}
+                          
+                          {% set ns.cards = ns.cards + [card_config] %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    {{ ns.cards | sort(attribute='name') }}
+                show_empty: false
               - type: custom:bubble-card
                 card_type: separator
                 name: Ramen & Deuren
@@ -1642,71 +1962,6 @@ views:
               icon: mdi:shield-off-outline
               styles: '.bubble-icon { opacity: 0.5; }'
     cards: []
-  - type: sections
-    theme: landelijk_industrieel
-    background:
-      opacity: 33
-      alignment: center
-      size: cover
-      repeat: repeat
-      attachment: fixed
-    cards: []
-    icon: mdi:car
-    max_columns: 4
-    sections:
-      - type: grid
-        cards:
-          - camera_view: live
-            fit_mode: contain
-            type: picture-glance
-            image: /api/image/serve/e4777ae465f23785868aad259ded064c/512x512
-            entities:
-              - entity: lock.t_roc_door_locked
-              - entity: binary_sensor.t_roc_vehicle_moving
-              - entity: lock.t_roc_trunk_locked
-            title: T-Roc
-            grid_options:
-              columns: 11
-              rows: 5
-            theme: landelijk_industrieel
-          - type: vertical-stack
-            cards:
-              - type: custom:bubble-card
-                card_type: button
-                button_type: state
-                entity: switch.t_roc_force_data_refresh
-                scrolling_effect: false
-                show_name: true
-                force_icon: false
-              - type: custom:bubble-card
-                card_type: button
-                button_type: state
-                entity: sensor.t_roc_oil_inspection_days
-                scrolling_effect: false
-              - type: custom:bubble-card
-                card_type: button
-                button_type: state
-                entity: sensor.t_roc_service_inspection_days
-              - type: custom:bubble-card
-                card_type: button
-                button_type: state
-                entity: sensor.t_roc_fuel_level
-              - type: custom:bubble-card
-                card_type: button
-                button_type: state
-                entity: sensor.t_roc_last_trip_duration
-        column_span: 2
-      - type: grid
-        cards:
-          - type: map
-            entities:
-              - entity: device_tracker.t_roc_position
-            theme_mode: auto
-            grid_options:
-              rows: 5
-              columns: 12
-        column_span: 2
-    title: T-Roc
   - title: Info & Diagnose
     path: info-diagnose
     icon: mdi:wrench-clock
