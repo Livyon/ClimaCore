@@ -19,8 +19,7 @@ SETPOINT_GROUPS = ["woonkamer", "badkamer", "keuken", "slaapkamer_1", "slaapkame
 def _get_general_schema(options: dict) -> vol.Schema:
     return vol.Schema({
         vol.Required("proactive_target_time", default=options.get("proactive_target_time", "06:00:00")): selector.TimeSelector(),
-        # night_start_time is hier weggehaald of mag blijven als 'global default', 
-        # maar wordt nu overruled door zone-instellingen.
+        vol.Required("night_start_time", default=options.get("night_start_time", "23:00:00")): selector.TimeSelector(),
         vol.Required("minutes_per_degree", default=options.get("minutes_per_degree", 30.0)): selector.NumberSelector({"min": 5.0, "max": 90.0, "step": 1.0, "mode": "slider", "unit_of_measurement": "min/°C"}),
     })
 
@@ -48,12 +47,8 @@ def _get_zone_schema_generic(zone_data: dict, zone_slot_key: str) -> vol.Schema:
     return vol.Schema({
         vol.Optional("zone_name", default=zone_data.get("zone_name", "")): selector.TextSelector(),
         vol.Optional("climate_entities", default=zone_data.get("climate_entities", [])): selector.EntitySelector(selector.EntitySelectorConfig(domain="climate", multiple=True)),
-        
-        # --- NIEUW: PER ZONE TIJDEN ---
         vol.Required("day_start", default=zone_data.get("day_start", "06:00:00")): selector.TimeSelector(),
         vol.Required("night_start", default=zone_data.get("night_start", "22:00:00")): selector.TimeSelector(),
-        # ------------------------------
-
         vol.Optional("window_sensors", default=zone_data.get("window_sensors", [])): selector.EntitySelector(selector.EntitySelectorConfig(domain="binary_sensor", multiple=True)),
         vol.Required("lookup_prefix", default=zone_data.get("lookup_prefix", "woonkamer")): selector.SelectSelector(selector.SelectSelectorConfig(options=SETPOINT_GROUPS, mode=selector.SelectSelectorMode.DROPDOWN)),
     })
