@@ -14,6 +14,7 @@ from homeassistant.components.http import StaticPathConfig
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_change,
+    async_track_time_interval, 
 )
 from homeassistant.helpers.entity_registry import (
     async_get as async_get_entity_registry,
@@ -94,7 +95,7 @@ class ClimaCoreCoordinator:
         self._listeners = []
         self._entity_registry: EntityRegistry | None = None
         self._is_running = False
-        self._boost_window = None # Voor de slimme voorverwarming override
+        self._boost_window = None 
 
     @callback
     def cleanup_listeners(self) -> None:
@@ -113,6 +114,7 @@ class ClimaCoreCoordinator:
         self._entity_registry = async_get_entity_registry(self.hass)
         
         main_triggers = []
+        
         if person_entities := self.options.get("person_entities"):
             main_triggers.extend(person_entities)
         if weather_entity := self.options.get("weather_entity"):
@@ -121,6 +123,13 @@ class ClimaCoreCoordinator:
             main_triggers.append(gasten_entity)
         if onderweg_entity := self.options.get("onderweg_entity"):
             main_triggers.append(onderweg_entity)
+            
+        # --- NIEUW: TAGS & WIFI ---
+        if presence_sensors := self.options.get("presence_sensors"):
+            main_triggers.extend(presence_sensors)
+        if wifi_sensors := self.options.get("wifi_tracker_sensors"):
+            main_triggers.extend(wifi_sensors)
+        # --------------------------
 
         if main_triggers:
             _LOGGER.debug(f"Listener voor Hoofdtriggers: {main_triggers}")
@@ -137,7 +146,7 @@ class ClimaCoreCoordinator:
                 window_sensors.extend(sensors)
         
         if window_sensors:
-            _LOGGER.debug(f"Listener voor Raamsensoren (beide kanten): {window_sensors}")
+            _LOGGER.debug(f"Listener voor Raamsensoren: {window_sensors}")
             self._listeners.append(
                 async_track_state_change_event(
                     self.hass, window_sensors, self.async_trigger_main_logic
@@ -148,8 +157,10 @@ class ClimaCoreCoordinator:
         self._listeners.append(async_track_time_change(self.hass, self.async_trigger_main_logic, hour=23, minute=0, second=0))
         self._listeners.append(async_track_time_change(self.hass, self.async_trigger_main_logic, hour=4, minute=59, second=59))
         self._listeners.append(async_track_time_change(self.hass, self.async_trigger_proactive_start, hour=4, minute=0, second=0))
+        
+        # HEARTBEAT
         self._listeners.append(async_track_time_interval(self.hass, self.async_trigger_main_logic, dt_util.dt.timedelta(minutes=10)))
-
+        
         _LOGGER.debug("Alle listeners zijn geregistreerd.")
 
     def _get_state(self, entity_id: str) -> str | None:
@@ -170,19 +181,16 @@ class ClimaCoreCoordinator:
         config_data = {key: value for key, value in self.options.items() if key.startswith("temp_")}
         config_data["fallback_temp"] = self.options.get("fallback_temp", 18.0)
 
-        # --- BOOST LOGICA (Tijdspoofing voor Cloud) ---
+        # BOOST LOGICA
         nu = dt_util.now()
         simulated_time_str = nu.strftime('%H:%M:%S')
         
         if self._boost_window:
             if self._boost_window["start"] <= nu < self._boost_window["end"]:
-                # We zitten in de 'Opwarmfase'. We vertellen de API dat het al ochtend is.
                 simulated_time_str = self._boost_window["end"].strftime('%H:%M:%S')
                 _LOGGER.info(f"BOOST ACTIEF: A.I. berekende voorverwarming. Ik simuleer tijdstip {simulated_time_str}.")
-            
             elif nu >= self._boost_window["end"]:
-                self._boost_window = None # Ochtend is bereikt, normaal schema hervatten
-        # ----------------------------------------------
+                self._boost_window = None
         
         context_data = {
             "current_time": simulated_time_str,
@@ -202,13 +210,23 @@ class ClimaCoreCoordinator:
             "systeem_keuze": self.options.get("systeem_keuze_direct", "Ambisense/MyPyllant")
         }
 
-        # --- DEFINITIEVE LOGICA: WI-FI DOMINANTIE ---
+        # --- WI-FI & TAG DOMINANTIE LOGICA ---
         persons_data = {}
         person_entities = self.options.get("person_entities", [])
         
+        # 1. Check Tag/Sensor Aanwezigheid (Nieuw)
+        tags = self.options.get("presence_sensors", [])
+        is_tag_home = False
+        for tag in tags:
+            state = self._get_state(tag)
+            # Accepteer 'home' (trackers) en 'on' (binary sensors/knoppen)
+            if state in ["home", "on", "active"]:
+                is_tag_home = True
+                break
+
+        # 2. Check Wi-Fi
         target_ssid = self.options.get("home_wifi_ssid")
         wifi_sensors = self.options.get("wifi_tracker_sensors", [])
-        
         is_wifi_connected = False
         if target_ssid and wifi_sensors:
             for sensor in wifi_sensors:
@@ -219,7 +237,8 @@ class ClimaCoreCoordinator:
         
         for entity_id in person_entities:
             gps_state = self._get_state(entity_id)
-            if is_wifi_connected:
+            # Als Wi-Fi OF Tag aanwezig is -> Iedereen is "Thuis"
+            if is_wifi_connected or is_tag_home:
                 persons_data[entity_id] = "home"
             elif gps_state == "home":
                 persons_data[entity_id] = "home"
@@ -243,7 +262,6 @@ class ClimaCoreCoordinator:
                 state = self._get_state(sensor_id)
                 if state: window_states.append(state)
             
-            # --- NIEUW: Tijden uitlezen per zone ---
             day_start = zone_config.get("day_start", "06:00:00")
             night_start = zone_config.get("night_start", "22:00:00")
 
@@ -252,7 +270,6 @@ class ClimaCoreCoordinator:
                 "lookup_prefix": zone_config.get("lookup_prefix", "woonkamer"),
                 "window_sensors": window_states,
                 "_all_climate_entities": zone_config["climate_entities"],
-                # SCHEDULE PER ZONE
                 "schedule": {
                     "start": day_start,
                     "end": night_start
@@ -271,11 +288,10 @@ class ClimaCoreCoordinator:
         for action in actions:
             try:
                 service = action.get("service")
-                entity_name = action.get("entity") # Zone Naam of 'notification'
+                entity_name = action.get("entity") 
                 data = action.get("data", {})
                 
-                if not service:
-                    continue
+                if not service: continue
 
                 if service == "delay":
                     delay_seconds = data.get("seconds", 1)
@@ -287,8 +303,7 @@ class ClimaCoreCoordinator:
                     await self.hass.services.async_call("persistent_notification", service.split('.')[1], data)
                     continue
 
-                if not entity_name:
-                    continue
+                if not entity_name: continue
 
                 zone_data = climate_zones_payload.get(entity_name)
                 if not zone_data:
@@ -296,8 +311,7 @@ class ClimaCoreCoordinator:
                     continue
 
                 target_entities = zone_data.get("_all_climate_entities", [])
-                if not target_entities:
-                    continue
+                if not target_entities: continue
                 
                 _LOGGER.debug(f"Actie: Roep service {service} aan voor {entity_name} | Data: {data}")
                 domain, service_name = service.split('.')
@@ -323,23 +337,19 @@ class ClimaCoreCoordinator:
 
         if args:
             try:
-                # Probeer event data te parsen als het een event is
                 if len(args) > 0 and hasattr(args[0], "data"):
                     event = args[0]
                     trigger_entity_id = event.data.get("entity_id")
                     old_state_obj = event.data.get("old_state")
                     new_state_obj = event.data.get("new_state")
-                # Anders is het waarschijnlijk een tijd-trigger (geen entity_id)
             except Exception:
                 _LOGGER.debug("Kon trigger details niet parsen (waarschijnlijk tijd-trigger).")
 
-        # --- JITTER FILTER (Ongewijzigd) ---
         if trigger_entity_id and trigger_entity_id.startswith("person."):
             if old_state_obj and new_state_obj and old_state_obj.state == new_state_obj.state:
                 _LOGGER.debug(f"Persoon trigger {trigger_entity_id} genegeerd: Alleen GPS/Nauwkeurigheid veranderd.")
                 return
 
-        # --- GECORRIGEERDE RAAM LOGICA ---
         is_window_trigger = False
         if trigger_entity_id:
             for i in range(1, 11):
@@ -349,29 +359,18 @@ class ClimaCoreCoordinator:
                     break
         
         if is_window_trigger:
-            # Bepaal wat er gebeurde: Openen of Sluiten?
             to_state = new_state_obj.state if new_state_obj else "unknown"
-            _LOGGER.debug(f"Raam {trigger_entity_id} ging naar '{to_state}'. Wacht 15s debounce...")
-            
+            _LOGGER.debug(f"Raamsensor {trigger_entity_id} ging naar '{to_state}'. Wacht 15s debounce...")
             await asyncio.sleep(15)
             
-            # Check de huidige live status
             current_state = self._get_state(trigger_entity_id)
-            
-            # LOGICA: Is de staat veranderd tijdens het wachten?
-            # Bijv: Ging OPEN -> Wacht -> Is nu weer DICHT? -> Annuleer.
-            # Bijv: Ging DICHT -> Wacht -> Is nu weer OPEN? -> Annuleer.
-            
             if to_state == "on" and current_state == "off":
                 _LOGGER.info(f"Debounce: Raam {trigger_entity_id} was even open, maar nu weer dicht. Genegeerd.")
                 return
-            
             if to_state == "off" and current_state == "on":
                 _LOGGER.info(f"Debounce: Raam {trigger_entity_id} was even dicht, maar nu weer open. Genegeerd.")
                 return
-
-            _LOGGER.debug(f"Raam {trigger_entity_id} status bevestigd als '{current_state}'. Actie uitvoeren.")
-        # ----------------------------------
+            _LOGGER.debug(f"Raam {trigger_entity_id} status bevestigd als '{current_state}'. Doorgaan met API-call.")
 
         if self._is_running:
             _LOGGER.warning("Trigger overgeslagen: ClimaCore is al bezig (anti-loop).")
@@ -407,7 +406,6 @@ class ClimaCoreCoordinator:
         
         weather_entity = self.options.get("weather_entity")
         woonkamer_climate_entity = None
-        # Zoek de 'woonkamer' zone om de huidige temp te weten voor de berekening
         for i in range(1, 11):
             zone_cfg = self.options.get(f"zone_{i}", {})
             if zone_cfg.get("lookup_prefix") == "woonkamer":
@@ -430,7 +428,6 @@ class ClimaCoreCoordinator:
         config_payload = {
             "proactive_target_time": self.options.get("proactive_target_time", "06:00:00"),
             "minutes_per_degree": self.options.get("minutes_per_degree", 30),
-            # Setpoints voor berekening
             "temp_woonkamer_dag_fris": self.options.get("temp_woonkamer_dag_fris", 20.5),
             "temp_woonkamer_dag_koud": self.options.get("temp_woonkamer_dag_koud", 21.0),
             "temp_woonkamer_dag_mild_warm": self.options.get("temp_woonkamer_dag_mild_warm", 20.0),
@@ -459,7 +456,6 @@ class ClimaCoreCoordinator:
 
             _LOGGER.info(f"Dynamische trigger ingesteld om hoofdlogica te starten om {start_datetime.isoformat()}")
 
-            # --- BOOST WINDOW LOGICA ---
             target_str = self.options.get("proactive_target_time", "06:00:00")
             target_time = time.fromisoformat(target_str)
             target_datetime = dt_util.as_local(dt_util.dt.datetime.combine(vandaag, target_time))
@@ -468,7 +464,6 @@ class ClimaCoreCoordinator:
                 "start": start_datetime,
                 "end": target_datetime
             }
-            # ---------------------------
             
             async_track_time_change(
                 self.hass, self.async_trigger_main_logic, 
