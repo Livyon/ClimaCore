@@ -36,6 +36,13 @@ def _get_entities_schema(options: dict) -> vol.Schema:
 def _get_persons_schema(options: dict) -> vol.Schema:
     return vol.Schema({
         vol.Required("person_entities", default=options.get("person_entities", [])): selector.EntitySelector({"domain": "person", "multiple": True}),
+        
+        # --- NIEUW: TAGS & SENSOREN ---
+        vol.Optional("presence_sensors", description="Bluetooth Tags, Deurcontacten of andere sensoren.", default=options.get("presence_sensors", [])): selector.EntitySelector({
+            "domain": ["binary_sensor", "device_tracker", "sensor", "input_boolean"], 
+            "multiple": True
+        }),
+        # ------------------------------
     })
 
 def _get_fallback_schema(options: dict) -> vol.Schema:
