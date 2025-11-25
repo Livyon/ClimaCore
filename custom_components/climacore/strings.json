@@ -26,7 +26,7 @@
         "menu_options": {
           "general": "Stap 1: Algemene Instellingen",
           "entities": "Stap 2: Hoofd-Entiteiten",
-          "persons": "Stap 3: Personen (Aanwezigheid)",
+          "persons": "Stap 3: Personen & Tags",
           "zone_config": "Stap 4: Zone Configuratie",
           "fallback": "Stap 7: Noodloop (Fallback)",
           "setpoints": "Stap 8: Temperaturen per Kamer"
@@ -53,10 +53,11 @@
         }
       },
       "persons": {
-        "title": "Personen",
-        "description": "Wie woont hier? (Voor aanwezigheidsdetectie)",
+        "title": "Personen & Tags",
+        "description": "Wie woont hier? En zijn er fysieke tags (sleutels)?",
         "data": {
-          "person_entities": "Selecteer Personen"
+          "person_entities": "Selecteer Personen (GPS)",
+          "presence_sensors": "Fysieke Tags / Sleutelhangers (Directe Detectie)"
         }
       },
       "fallback": {
