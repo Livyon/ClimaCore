@@ -5,10 +5,11 @@ import os
 from typing import Any
 from datetime import time
 
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, callback, CoreState
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    Platform, ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
+    Platform, ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN,
+    EVENT_HOMEASSISTANT_STARTED
 )
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.helpers.event import (
@@ -40,7 +41,7 @@ async def async_options_updated(hass: HomeAssistant, entry: ConfigEntry) -> None
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Zet ClimaCore op vanuit een config entry."""
     
-    _LOGGER.info(f"ClimaCore v1.5.0 (schone setup) aan het opzetten...")
+    _LOGGER.info(f"ClimaCore v1.5.8 aan het laden...")
     
     api_client = ClimaCoreApiClient(entry.data.get(CONF_ACTIVATION_CODE))
     coordinator = ClimaCoreCoordinator(hass, entry, api_client)
@@ -58,9 +59,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     ])
     _LOGGER.info(f"Assets geregistreerd op URL: /{DOMAIN}_assets")
     
-    await coordinator.setup_listeners()
+    # --- AANPASSING: Wacht op volledige start van Home Assistant ---
+    async def _start_climacore_logic(_):
+        """Wordt uitgevoerd zodra HA volledig is opgestart."""
+        _LOGGER.info("Home Assistant is volledig gestart (Event). ClimaCore activeert nu zijn triggers.")
+        await coordinator.setup_listeners()
+        
+        # We voeren één keer een 'clean sweep' uit om zeker te zijn dat de status klopt
+        await coordinator.async_trigger_main_logic()
 
-    _LOGGER.info("ClimaCore succesvol ingesteld en listeners gestart.")
+    # --- HIER ZAT DE FOUT (Nu gecorrigeerd naar kleine letters) ---
+    if hass.state == CoreState.running:
+        # Als we de integratie herladen terwijl HA al draait, start direct
+        await _start_climacore_logic(None)
+    else:
+        # Anders: Wacht netjes in de wachtrij tot HA klaar is
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _start_climacore_logic)
+    # ---------------------------------------------------------------
+
+    _LOGGER.info("ClimaCore setup voltooid (in wachtstand tot volledige start).")
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -293,9 +310,10 @@ class ClimaCoreCoordinator:
                 
                 if not service: continue
 
+                # Vertragingen en notificaties altijd uitvoeren
                 if service == "delay":
                     delay_seconds = data.get("seconds", 1)
-                    _LOGGER.debug(f"Actie: Wacht {delay_seconds} seconden...")
+                    # _LOGGER.debug(f"Actie: Wacht {delay_seconds} seconden...")
                     await asyncio.sleep(delay_seconds)
                     continue
 
@@ -313,6 +331,37 @@ class ClimaCoreCoordinator:
                 target_entities = zone_data.get("_all_climate_entities", [])
                 if not target_entities: continue
                 
+                # --- NIEUWE API BESPARINGS LOGICA ---
+                # We checken of de actie wel nodig is om de API te sparen.
+                should_execute = True
+                primary_entity = target_entities[0]
+                current_state_obj = self.hass.states.get(primary_entity)
+
+                if current_state_obj:
+                    # 1. Check Temperatuur Setpoint
+                    if "temperature" in data:
+                        target_temp = float(data["temperature"])
+                        try:
+                            current_setpoint = float(current_state_obj.attributes.get("temperature", -1))
+                            # Als het verschil kleiner is dan 0.1 graad, doe niets.
+                            if abs(current_setpoint - target_temp) < 0.1:
+                                _LOGGER.debug(f"SKIP: {primary_entity} staat al op {target_temp}°C.")
+                                should_execute = False
+                        except (ValueError, TypeError):
+                            pass # Kan huidige niet lezen, dus forceer update
+
+                    # 2. Check HVAC Mode (heat/cool/auto)
+                    if "hvac_mode" in data and should_execute:
+                        target_mode = data["hvac_mode"]
+                        current_mode = current_state_obj.state
+                        if current_mode == target_mode:
+                            _LOGGER.debug(f"SKIP: {primary_entity} staat al op modus '{target_mode}'.")
+                            should_execute = False
+                
+                if not should_execute:
+                    continue
+                # ------------------------------------
+
                 _LOGGER.debug(f"Actie: Roep service {service} aan voor {entity_name} | Data: {data}")
                 domain, service_name = service.split('.')
                 
@@ -344,11 +393,6 @@ class ClimaCoreCoordinator:
                     new_state_obj = event.data.get("new_state")
             except Exception:
                 _LOGGER.debug("Kon trigger details niet parsen (waarschijnlijk tijd-trigger).")
-
-        if trigger_entity_id and trigger_entity_id.startswith("person."):
-            if old_state_obj and new_state_obj and old_state_obj.state == new_state_obj.state:
-                _LOGGER.debug(f"Persoon trigger {trigger_entity_id} genegeerd: Alleen GPS/Nauwkeurigheid veranderd.")
-                return
 
         is_window_trigger = False
         if trigger_entity_id:
@@ -449,28 +493,38 @@ class ClimaCoreCoordinator:
             start_tijd = time.fromisoformat(start_tijd_str)
             vandaag = dt_util.now().date()
             start_datetime = dt_util.as_local(dt_util.dt.datetime.combine(vandaag, start_tijd))
+            
+            # Huidige tijd ophalen
+            nu = dt_util.now()
 
-            if start_datetime < dt_util.now():
-                _LOGGER.warning(f"Berekende starttijd {start_tijd_str} ligt in het verleden. Wordt overgeslagen.")
-                return
-
-            _LOGGER.info(f"Dynamische trigger ingesteld om hoofdlogica te starten om {start_datetime.isoformat()}")
-
+            # --- DE CRUCIALE BOOST CONFIGURATIE ---
             target_str = self.options.get("proactive_target_time", "06:00:00")
             target_time = time.fromisoformat(target_str)
             target_datetime = dt_util.as_local(dt_util.dt.datetime.combine(vandaag, target_time))
-            
+
+            # Stel het window in, dit zorgt dat main_logic de tijd "simuleert"
             self._boost_window = {
                 "start": start_datetime,
                 "end": target_datetime
             }
-            
-            async_track_time_change(
-                self.hass, self.async_trigger_main_logic, 
-                hour=start_datetime.hour, 
-                minute=start_datetime.minute, 
-                second=start_datetime.second
-            )
+
+            # --- INTELLIGENTE TRIGGER LOGICA ---
+            # Situatie A: Starttijd is in de toekomst
+            if start_datetime > nu:
+                _LOGGER.info(f"Dynamische trigger ingesteld voor {start_datetime.isoformat()}")
+                async_track_time_change(
+                    self.hass, self.async_trigger_main_logic, 
+                    hour=start_datetime.hour, 
+                    minute=start_datetime.minute, 
+                    second=start_datetime.second
+                )
+
+            # Situatie B: Starttijd is in het verleden (Catch-up)
+            else:
+                _LOGGER.warning(f"Het is koud! Berekende starttijd ({start_tijd_str}) is al verstreken. We starten DIRECT.")
+                # Omdat self._boost_window hierboven al is ingesteld, zal main_logic nu correct "Ochtend" simuleren!
+                await self.async_trigger_main_logic()
+                
         except (ApiAuthError, ApiConnectionError, ApiTimeoutError) as e:
             _LOGGER.error(f"Fout tijdens aanroepen Proactieve Start API: {e}")
         except Exception as e:
