@@ -14,12 +14,14 @@
 **Powered by ClimaCore A.I.**
 
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Custom%20Component-blue)](https://www.home-assistant.io)
-[![HACS](https://img.shields.io/badge/HACS-Default-orange)](https://hacs.xyz)
-[![Version](https://img.shields.io/badge/Version-2.0.0%20Pro-green)]()
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange)](https://hacs.xyz)
+[![Version](https://img.shields.io/badge/Version-1.5.8%20(Stable)-green)]()
 
 **Transformeer Home Assistant van een hobby-project naar een Intelligent Woning Besturingssysteem.**
 
 Home Optimizer combineert krachtige A.I. klimaatsturing (ClimaCore) met een prachtig, zelf-organiserend dashboard. Geen urenlang coderen per apparaat, maar een systeem dat zich aanpast aan jouw huis.
+
+*Nu met **Self-Healing Startup**: Het systeem wacht intelligent tot uw woning volledig online is na een stroompanne of herstart, voordat het begint te rekenen.*
 
 ---
 
@@ -38,7 +40,12 @@ Elk huis is uniek. Een nieuwbouwwoning met vloerverwarming warmt trager op dan e
 #### 2. Gevoelstemperatuur Logica (RV-Compensatie)
 21°C bij droog weer voelt warm, maar 21°C bij regenachtig weer voelt kil. ClimaCore meet de **Relatieve Vochtigheid** buiten en past automatisch het stookprofiel aan ("Dag - Koud") om die klamme kilte uit huis te halen, nog voordat u het koud krijgt.
 
-#### 3. Contextuele Aanwezigheid (Universeel)
+#### 3. Smart API Guard & Batterij Bescherming (NIEUW)
+ClimaCore is niet alleen slim, maar ook zuinig op uw hardware. Voordat het een commando stuurt, controleert de *Smart API Guard* of de thermostaat al in de juiste stand staat.
+* **Cloud (Vaillant/Tado):** Voorkomt API-blokkades en storingen door overbelasting.
+* **Lokaal (Zigbee):** Bespaart drastisch op batterijen van radiatorkranen doordat ze niet onnodig wakker worden gemaakt.
+
+#### 4. Contextuele Aanwezigheid (Universeel)
 Geen koude thuiskomst meer, en nooit meer stoken voor een leeg huis.
 * **Slimme Reistijd:** ClimaCore berekent hoe ver u van huis bent en vraagt proactief of de verwarming alvast aan moet (werkt met **Android Auto** én **Apple CarPlay**).
 * **Intelligente Filters:** Het systeem snapt wanneer u écht weg bent en filtert korte GPS-storingen eruit.
@@ -78,5 +85,7 @@ Wanneer u kiest voor Home Optimizer, krijgt u een complete suite:
 2.  **Universele Blueprints:** Automatiseringen voor aanwezigheid en voorverwarming (iOS & Android).
 3.  **Dashboard Template:** De "Master Code" voor een onderhoudsvrij dashboard.
 
+> **Opmerking:** Voor de werking van de A.I. logica is een geldige **Activatiecode** vereist.
+
 ---
-<p align="center"><em>Developed by Home Optimizer</em></p>
+<p align="center"><em>Developed by Home Optimizer - Copyright &copy; 2025</em></p>
