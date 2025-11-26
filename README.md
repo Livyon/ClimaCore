@@ -77,13 +77,6 @@ Wanneer u kiest voor Home Optimizer, krijgt u een complete suite:
 1.  **ClimaCore Integratie:** De A.I. hersenen van het systeem (Custom Component).
 2.  **Universele Blueprints:** Automatiseringen voor aanwezigheid en voorverwarming (iOS & Android).
 3.  **Dashboard Template:** De "Master Code" voor een onderhoudsvrij dashboard.
----
-
-## 🚀 Aan de slag
-
-Klaar om uw comfort te verhogen? De installatie is eenvoudig en stap-voor-stap uitgelegd.
-
-[**📖 KLIK HIER VOOR DE INSTALLATIEHANDLEIDING**](HANDLEIDING.md)
 
 ---
 <p align="center"><em>Developed by Home Optimizer</em></p>
