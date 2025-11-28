@@ -79,7 +79,7 @@ ClimaCore komt met een prachtig, kant-en-klaar dashboard gebaseerd op **Bubble C
 
 ## 📦 Inhoud van het pakket
 
-Wanneer u kiest voor Home Optimizer, krijgt u een complete suite:
+Wanneer u kiest voor Core Automations, krijgt u een complete suite:
 
 1.  **ClimaCore Integratie:** De A.I. hersenen van het systeem (Custom Component).
 2.  **Universele Blueprints:** Automatiseringen voor aanwezigheid en voorverwarming (iOS & Android).
