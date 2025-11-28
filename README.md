@@ -10,7 +10,7 @@
 
 ---
 
-# 🏠 Home Optimizer
+# 🏠 Core Automations
 **Powered by ClimaCore A.I.**
 
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Custom%20Component-blue)](https://www.home-assistant.io)
@@ -19,7 +19,7 @@
 
 **Transformeer Home Assistant van een hobby-project naar een Intelligent Woning Besturingssysteem.**
 
-Home Optimizer combineert krachtige A.I. klimaatsturing (ClimaCore) met een prachtig, zelf-organiserend dashboard. Geen urenlang coderen per apparaat, maar een systeem dat zich aanpast aan jouw huis.
+Core Automations combineert krachtige A.I. klimaatsturing (ClimaCore) met een prachtig, zelf-organiserend dashboard. Geen urenlang coderen per apparaat, maar een systeem dat zich aanpast aan jouw huis.
 
 *Nu met **Self-Healing Startup**: Het systeem wacht intelligent tot uw woning volledig online is na een stroompanne of herstart, voordat het begint te rekenen.*
 
