@@ -50,6 +50,11 @@ Geen koude thuiskomst meer, en nooit meer stoken voor een leeg huis.
 * **Slimme Reistijd:** ClimaCore berekent hoe ver u van huis bent en vraagt proactief of de verwarming alvast aan moet (werkt met **Android Auto** én **Apple CarPlay**).
 * **Intelligente Filters:** Het systeem snapt wanneer u écht weg bent en filtert korte GPS-storingen eruit.
 
+#### 5. Hybride Protocol Technologie (Multi-Vendor)
+De meeste systemen sluiten u op in één ecosysteem ("Vendor Lock-in"). ClimaCore is agnostisch.
+Tijdens de installatie kiest u eenvoudig uw protocol:
+* **Ambisense (Cloud):** Voor naadloze integratie met bestaande Vaillant myPyllant systemen.
+* **Zigbee (Lokaal):** Voor directe aansturing van universele radiatorkranen, onafhankelijk van merk of cloud-servers.
 ---
 
 ## 📱 Het Gezicht: Universeel Dashboard
